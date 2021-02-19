@@ -132,3 +132,80 @@ _MyAppState는 main.dart 파일 내에서만 접근 가능하며, MyApp 클래�
 
 이는 변수에도 적용되는데, 같은 파일 내에서만 접근할 수 있게 하고 싶다면 접두사로 \_를 붙이면 된다. 이는 Class의 private property와 같다.
 마찬가지로 함수에도 적용할 수 있다. (private function)
+
+
+<br><br>
+
+
+## 7. First Styling & Layouting
+
+```
+return Container(
+    margin: EdgeInsets.all(10),
+    width: double.infinity,
+    child: Text(
+        'text', 
+        style: TextStyle(fontSize: 28),
+        textAlign: TextAlign.center
+    )
+);
+```
+
+- margin: spacing around the container
+
+<br>
+
+### 1) The container()
+container widget is a special widget which actually has a bunch of settings that allow you to space things and to align things.
+The core of the container always is the child, in our case that's the text widget.
+
+However we can set up some padding, that is internal spacing inside of the container.
+Now inside means that container also may have a border which marks the border of the container .
+That border can be drawn, you can give it a color.
+Outside of the border, you have that margin.
+So that's the spacing around the container, between the container and neighboring elements.
+so that overall makes up the container.
+
+
+<img src="./images/container.png" width="500">
+
+
+<br><br>
+
+
+## 8. Multiple Constructors
+
+```
+margin: EdgeInsets.all(10)
+
+[edge_insets.dart]
+const EdgeInsets.all(double value)
+: left = value,
+    top = value,
+    right = value,
+    bottom = value;
+```
+
+instead of directly adding parentheses thereafter, we add dot some name and that is a Dart feautre which allows you to define multiple constuctors per class.
+Each constuctor create a new instance of this class but with different configurations, with different settings.
+That make it easy for you create different EdgeInsets, which is basically a settings container setting up spaces, setting up different EdgeInsets container with different configuration with these utility functions here, with these utility constuctors.
+
+```
+// Dart
+
+class Person {
+    String name;
+    int age;
+}
+
+Person({this.name, this.age = 30})
+
+Person.veryOld(this.name){
+    age=60
+}
+
+var p3 = Person.veryOld('Max')
+```
+
+
+
