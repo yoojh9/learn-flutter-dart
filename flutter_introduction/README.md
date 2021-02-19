@@ -21,13 +21,13 @@ flutter builds up on dart.
 it's a framework for Dart and Dart actually is the programming launage which we're using.
 Flutter is just a collection of tools, a set of features, utility functions and these widgets which are implemented using dart
 
-<img src="./images/flutter_and_dart.png" width="600">
+<img src="./images/flutter_and_dart.png" width="700">
 
 <br><br>
 
 ## 2. Flutter Architecture
 
-<img src="./images/flutter_architecture.png" width="500">
+<img src="./images/flutter_architecture.png" width="600">
 
 
 ### 1) Everything's Widget!
@@ -55,7 +55,7 @@ so Flutter does not compile your code to some native equivalence or native alter
 instead Flutter ships with its own engine which controls the entire screen, 
 everything the user sees and render every pixel on its own and that gives Flutter a lot of control and a lot of flexibility
 
-<img src="./images/flutter_platform.png" width="600">
+<img src="./images/flutter_platform.png" width="700">
 
 
 
@@ -84,4 +84,4 @@ Material Design is built into Flutter but you also find Apple-styled (Cupertino)
 
 ## 5. Flutter vs React Native vs Ionic
 
-<img src="./images/flutter_compare.png" width="600">
+<img src="./images/flutter_compare.png" width="700">
