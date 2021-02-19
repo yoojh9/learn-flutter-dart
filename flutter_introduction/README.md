@@ -29,13 +29,14 @@ Flutter is just a collection of tools, a set of features, utility functions and 
 
 <img src="./images/flutter_architecture.png" width="600">
 
+<br>
 
 ### 1) Everything's Widget!
 flutter is everything's a widget.
 
 <img src="./images/flutter_widget.png" width="600">
 
-
+<br>
 
 ### 2) Your App's UI is a Widget Tree!
 
