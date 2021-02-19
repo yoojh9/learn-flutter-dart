@@ -8,7 +8,7 @@ A 'tool' that allows you to build **native cross-platform**(iOS, Android) apps w
 - SDK: collection of tools that allows you to write one codebase or use one codebase with one programming language
 - A Framework / Widget Library: vast collection of reusable UI building blocks (=widgets), build user interfaces with these tools.
 
-<img src="./images/flutter.png" width="500>
+<img src="./images/flutter.png" width="500">
 
 
 ### 1) Dart?
@@ -21,31 +21,31 @@ flutter builds up on dart.
 it's a framework for Dart and Dart actually is the programming launage which we're using.
 Flutter is just a collection of tools, a set of features, utility functions and these widgets which are implemented using dart
 
-<img src="./images/flutter_and_dart.png" width="500>
+<img src="./images/flutter_and_dart.png" width="500">
 
 <br><br>
 
 ## 2. Flutter Architecture
 
-<img src="./images/flutter_architecture.png" width="500>
+<img src="./images/flutter_architecture.png" width="500">
 
 
 ### 1) Everything's Widget!
 flutter is everything's a widget.
 
-<img src="./images/flutter_widget.png" width="500>
+<img src="./images/flutter_widget.png" width="500">
 
 
 
 ### 2) Your App's UI is a Widget Tree!
 
-<img src="./images/flutter_widget_tree.png" width="500>
+<img src="./images/flutter_widget_tree.png" width="500">
 
 
 
 ## 3. How is Flutter / Dart "transformed" to a Native App?
 
-<img src="./images/flutter_compile.png" width="500>
+<img src="./images/flutter_compile.png" width="500">
 
 
 ### 1) Flutter Does NOT use Platform Primitives
@@ -54,7 +54,7 @@ so Flutter does not compile your code to some native equivalence or native alter
 instead Flutter ships with its own engine which controls the entire screen, 
 everything the user sees and render every pixel on its own and that gives Flutter a lot of control and a lot of flexibility
 
-<img src="./images/flutter_platform.png" width="500>
+<img src="./images/flutter_platform.png" width="500">
 
 
 
@@ -68,7 +68,7 @@ https://flutter-ko.dev/docs/get-started/install/macos 참고
 
 ### 1) Materfial Design Everywhere
 
-<img src="./images/material_design.png" width="500>
+<img src="./images/material_design.png" width="500">
 
 
 Material is a Design System created(and heavily used) by Google.
@@ -79,4 +79,4 @@ Material Design is built into Flutter but you also find Apple-styled (Cupertino)
 
 ## 5. Flutter vs React Native vs Ionic
 
-<img src="./images/flutter_compare.png" width="500>
+<img src="./images/flutter_compare.png" width="500">
