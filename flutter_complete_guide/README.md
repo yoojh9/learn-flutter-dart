@@ -176,7 +176,10 @@ so that overall makes up the container.
 ## 8. Multiple Constructors
 
 ```
-margin: EdgeInsets.all(10)
+Container(
+    margin: EdgeInsets.all(10),
+    ...
+)
 
 [edge_insets.dart]
 const EdgeInsets.all(double value)
