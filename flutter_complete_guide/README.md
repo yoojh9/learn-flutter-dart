@@ -427,4 +427,4 @@ and This also not using it as the address of a function because this is not func
 
 ## 17. Summary
 
-<image src="./images/summary.png" width="700">
+<image src="./images/summary.png" width="800">
