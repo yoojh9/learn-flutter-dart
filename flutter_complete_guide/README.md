@@ -210,5 +210,138 @@ Person.veryOld(this.name){
 var p3 = Person.veryOld('Max')
 ```
 
+<br><br>
+
+## 9. Official Docs & The Widget Catalog
+- [official Documentation](https://flutter-ko.dev/docs)
+
+<br><br>
+
+## 10. Passing Callback Functions Around
+생성자를 통해 callback Function을 전달할 수도 있음. 이는 Function의 pointer를 전달하는 것으로, 즉시 실행하지 않고 trigger 될 때 실행할 수 있음
+
+```
+[main.dart]
+
+  void _answerQuestion() {
+    print('function')
+  }
+
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('My First App')),
+          body: Column(children: [
+            ...
+            Answer(_answerQuestion),
+          ],) 
+      ),
+    );
+
+[answer.dart]
+class Answer extends StatelessWidget {
+
+  final Function selectHandler; // function
+
+  Answer(this.selectHandler);   // constructor
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      child: RaisedButton(
+        child: Text('Answer 1'), 
+        onPressed: selectHandler,
+      ),
+    );
+  }
+}
+
+```
+
+<br><br>
+
+## 11. Mapping Lists to Widgets
+### 1) map() 
+The map method executes a function which you have to pass as an argument to map on every element in the list which you're calling map.
+
+```
+questions[_questionIndex]['answers'].map((answer) {
+    return Answer(answer);
+})
+```
+
+in this case on every element in the question list.
+That function automatically receives an argument itself.
+this function will be executed for every element in the question list and the current element for the current function execution.
+That is received as an argument inside of this function which is applied to every element.
+
+so we get the single question, we have to return a new value because map returns a new list where we don't have to keep the old structure. 
+
+**Note:** map does not change the original question list. it does not change this variable or the value in there. it generates a new list instead based on the old list and then the transformation we do in the body of that function will be passed to map.
 
 
+위 코드는 Dart에서 에러가 발생한다. 에러를 고치기 위해 list를 wrapping 하는 작업이 필요하다.
+
+```
+(questions[_questionIndex]['answers'] as List)
+```
+
+Answer는 constuctor에서 string argument를 받는 부분이 없으므로 생성자의 2번째 인자로 answer를 추가해야 한다.
+
+<br>
+
+```
+[answer.dart]
+
+  final Function selectHandler;
+  final String answerText;
+
+  Answer(this.selectHandler, this.answerText);
+
+
+[main.dart]
+
+(questions[_questionIndex]['answers'] as List<String>).map((answer) {
+    return Answer(_answerQuestion, answer);
+})
+
+```
+
+map() 함수는 list를 리턴하지 않고 iterable을 리턴한다. 우리가 실제로 원하는 것은 iterable이 아닌 list이기 때문에 .toList() 함수를 추가하여 list를 리턴하도록 변경한다.
+
+```
+[main.dart]
+
+(questions[_questionIndex]['answers'] as List<String>).map((answer) {
+    return Answer(_answerQuestion, answer);
+}).toList()
+
+```
+
+<br>
+
+하지만 여전히 문제가 남아있다. 위의 코드는 List<Answer>로 리턴되지만 우리는 Widget 타입이 필요하다.
+이를 위해 코드 앞에 ...을 추가하여 List를 해체한다.
+
+```
+[main.dart]
+
+...(questions[_questionIndex]['answers'] as List<String>).map((answer) {
+    return Answer(_answerQuestion, answer);
+}).toList()
+
+```
+
+<br>
+
+아래는 Dart의 triple dot(...) spread operator 예제이다.
+
+```
+List<int> l1 = [1, 2, 3];
+List<int> l2 = [4, 5];
+List<int> result = [...l1, ...l2];
+print(result);
+```
+
+Output: [1,2,3,4,5]
