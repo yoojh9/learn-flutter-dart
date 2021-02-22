@@ -345,3 +345,82 @@ print(result);
 ```
 
 Output: [1,2,3,4,5]
+
+<br><br>
+
+## 12. final vs const
+
+- **final**: runtime constant value. it depends on the concrete instance we create. can't change runtime.
+- **const**: compile time constant value, not runtime constant. can't change compile time.
+
+```
+    const questions = [];
+
+    questions = const []
+
+```
+
+위 코드에서 둘의 차이점은 위 코드는 variable이 constant이고, 아래는 value가 constant이다.
+what Dart actually stores in the variables are the pointers at the objects in memory, so the addresses of the objects in memory.
+
+```
+var dummy = ['Hello'];
+dummy.add('Max');       // unlike map, it modify the original list ay adding a new item.
+print(dummy);  // [Hello, Max]
+
+// value constant : this is not work.
+var dummy = const ['Hello'];
+dummy.add('Max');
+print(dummy);   
+```
+
+<br><br>
+
+## 13. Introducing 'if' statements
+현재까지의 앱은 세번째 질문에서 답을 누르면 index 관련 에러가 발생한다. 이 에러를 해결하기 위해 _answerQuestion() 함수에 if 조건을 추가하고, 
+if(_questionIndex < questions.length) 조건문을 추가하려고 한다. 하지만 questions가 build() 메소드 scoped의 변수이므로, _answerQuestion() 함수에서는 접근할 수 없다.
+이 때문에 const questions을 _MyAppState 클래스 범위의 변수로 변경하여 _answerQuesion() 메소드에서도 접근할 수 있도록 한다.
+
+하지만 클래스 범위의 변수는 const 키워드를 사용할 수 없다. 이를 위한 두가지 해결 방법이 있다.
+
+- 1) const 키워드 앞에 static 키워드를 추가한다 (static const questions)
+- 2) const -> final로 변경 (final questions = const []  // never change)
+
+<br><br>
+
+## 14. Outputting Widgets Conditionally
+삼항연산자 사용
+
+<br><br>
+
+## 15. Splitting the App into Widgets
+
+### 1) Should I Split It?
+It's better to have smaller widgets than large widgets. 
+Quiz() 위젯과 Result() 위젯 생성
+
+<br><br>
+
+## 16. Getter
+unlike in a method, you now don't add () because a getter is like a method that can never receive any arguments.
+you do add a body, you have return a value
+
+we will use 'resultPhrase'. it doesn't need parentheses () to execute it like a function.
+and This also not using it as the address of a function because this is not function, This is simply Dart feature.
+
+
+```
+// result.dart
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        resultPhrase, 
+        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+      )
+    );
+  }
+```
+
+<image src="./images/summary.png" width="500">
