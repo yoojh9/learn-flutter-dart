@@ -383,8 +383,8 @@ if(_questionIndex < questions.length) 조건문을 추가하려고 한다. 하�
 
 하지만 클래스 범위의 변수는 const 키워드를 사용할 수 없다. 이를 위한 두가지 해결 방법이 있다.
 
-- 1) const 키워드 앞에 static 키워드를 추가한다 (static const questions)
-- 2) const -> final로 변경 (final questions = const []  // never change)
+- const 키워드 앞에 static 키워드를 추가한다 (static const questions)
+- const -> final로 변경 (final questions = const []  // never change)
 
 <br><br>
 
