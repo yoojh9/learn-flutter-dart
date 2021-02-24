@@ -320,8 +320,100 @@ ListView.builder(
 )
 ```
 
+<br><br>
+
+## 11. Adding AppBar buttons & Floating Action Buttons
+
+```
+ return Scaffold(
+    appBar: AppBar(
+    title: Text('Flutter App'),
+    actions: [
+        IconButton(icon: Icon(Icons.add), onPressed: (){})
+    ],
+    body: ....,
+    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    floatingActionButton: FloatingActionButton(child: Icon(Icons.add), onPressed: (){},),
+    ),
+ );
+```
+
+## 12. Showing a Modal Bottom Sheet
+
+builder is a function that needs to return the widget that should be inside of that modal bottom sheet.
+The builder function itself also gives us a context and make this clear that this is not the same value as this context. 
+BuildContext ctx we pass to the function to pass it to the modal bottom sheet, The modal bottom sheet then starts building that shet that slides in and 
+to that builder, it again gives us its own context, so its own package of meta information about that widget which it builds. 
+
+```
+void startAddNewTransaction(BuildContext ctx){
+    showModalBottomSheet(context: ctx, builder: (bCtx){});
+}
+```
+
+<br><br>
+
+## 13. Improving & Styling the Modal Bottom Sheet
+현재까지 실습은 Modal Bottom Sheet에 NewTransaction 위젯을 render 시켰다. 하지만 NewTransaction에서 새로운 데이터를 등록해도 TransactionList 위젯에 추가가 되지 않는 현상이 발생한다.
+
+A widget being re-evaluated means that any internally stored data is reset and then lost. That's why we lose our user input in StatelessWidget. 
+becuase whenever it is re-evaluate by flutter, for whatever reason, we lost the state that stored in there, we lose our data that's stored in there.
+
+And for a StatefulWidget, that's different. we have that separate state object, that State Class and while the widget also would be re-evaluated by flutter, the state kind of detach from this. and data stored in that state will not be lost if the widget that belongs to it is reevaluated by flutter.
+
+<br>
+
+You can access the properties and methods of your **widget** class instead of StateClass 
+It's only available in state classes and gives you access to the connected widget.
+
+```
+class NewTransaction extends StatefulWidget {
+  final Function addNewTransaction;
+  NewTransaction(this.addNewTransaction);
+
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+
+  void submitData(){
+    ...
+
+    widget.addNewTransaction(
+      enteredTitle,
+      enteredAmount
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ...
+  }
+
+```
+
+<br><br>
+
+## 14. Configuring & Using Themes
+
+### 1) Theme
+to set up a global application-wide theme and theme basically means a combination of colors, of text style, of font size that entire application uses, that many of Flutter's widgets then use as a default. 
+
+**primarySwatch** : The difference is that the primary color is one single color like blue or red and the primary swatch is based on one single color but it automatically generates different shades of that color automatically. many of FLutter's default widgets need these different shades and if you only defind your primary color not the swatch, then these shades are not available and therefore all these Flutter widgets will fallback to other defaults or use your primary color is look worse.
+
+so you should define a primary swatch there and what you pass there is still a single color though, all these shades are then generated automatically based on the color
 
 
+**accentColor** : besides the primary swatch, you'll often also have an accentColor. The accentColor like the name suggests is an alternative color becuase often you want to mix colors 
 
+```
+return MaterialApp(
+    theme: ThemeData(
+        primarySwatch: Colors.lightGreen,
+        accentColor: Colors.amber
+    )
+)
+```
 
 
