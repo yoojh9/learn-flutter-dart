@@ -2,7 +2,7 @@
 
 ## 1. An Overview of the Core Flutter Widgets
 
-<image srg="./images/most_important_widget.png" width="600">
+<image srg="./images/most_important_widget.png" width="700">
 
 ### 1) MaterialApp/CupertinoApp
  - Typically the root widget in your app
@@ -34,7 +34,7 @@ a nice widget that gives us a lot of different styling and alignment options so 
 
 <br><br>
 
-<image srg="./images/layout_and_children.png" width="600">
+<image srg="./images/layout_and_children.png" width="700">
 
 besides these layout widgets, we also have specific widgets that work together with row and column.
 
@@ -44,7 +44,7 @@ both flexible and expanded can be used in both row and column widgets.
 
 <br><br>
 
-<image src="./images/content_container.png" width="600">
+<image src="./images/content_container.png" width="700">
 
 ### 5) Stack
  - Used to position item on top of eatch other(along the Z axis)
@@ -58,7 +58,7 @@ both flexible and expanded can be used in both row and column widgets.
 
 <br><br>
 
-<image src="./images/repeat_elements.png" width="600">
+<image src="./images/repeat_elements.png" width="700">
 
 ### 7) ListView/GridView
  - Used to output lists(or grids) of items
@@ -89,7 +89,7 @@ inside ListView, you could use a ListTile widget. It's just a widget that comes 
 
  <br><br>
 
-<image src="./images/user_input.png" width="600">
+<image src="./images/user_input.png" width="700">
 
 ### 12) TextField
  - Renders an editable text field where the user can enter (type) information
@@ -178,7 +178,7 @@ inside ListView, you could use a ListTile widget. It's just a widget that comes 
 
  ### 2) Column & Row
 
- <image src="./images/column_and_row.png" width="500">
+ <image src="./images/column_and_row.png" width="700">
  
  How you want to position the items that you have inside your column and row.
 
@@ -188,24 +188,24 @@ inside ListView, you could use a ListTile widget. It's just a widget that comes 
  
  ### 3) Alignments
 
- <image src="./images/alignment.png" width="500">
+ <image src="./images/alignment.png" width="700">
 
  <br>
 
  ### 4) Flexible & Expanded
 
- <image src="./images/flexible_and_expanded.png" width="500">
+ <image src="./images/flexible_and_expanded.png" width="700">
 
  <br>
 
- <image src="./images/flexible_and_expanded2.png" width="500">
+ <image src="./images/flexible_and_expanded2.png" width="700">
 
 
  <br><br>
 
  ## 3. Container vs Column vs Row
 
- <image src="./images/container_vs_column_vs_row" width="500">
+ <image src="./images/container_vs_column_vs_row.png" width="700">
 
  container takes exactly one child widget and the columns and rows on the opposite take multiple.
  another difference is that a container, unlike column and row, gives you rich alignment and styling options. you can add a decoration with this seperate BoxDecoration object where you can add a border, a border. and you can add margin and padding to a container, you can align things in the container.
@@ -300,7 +300,7 @@ The alternative way of using the ListView is to use the builder constructor. Tha
 
 but That ListView works differently.
 
-<image src="./images/listview.png" width="500">
+<image src="./images/listview.png" width="700">
 
 
 **ListView(children:[])** : this have child widgets and ListView is like a column with a SingleChildScrollView around it. therefore it's able to have more items than we have space on the screen. because it has an infinite height or width.
