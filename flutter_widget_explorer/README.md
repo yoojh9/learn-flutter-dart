@@ -551,3 +551,22 @@ Text(
 
 <image src="./images/boxfit_3.png" width="700">
 
+<br><br>
+
+## 17. Creating Bars for our Chart
+
+### 1) Stack
+Stack widget allows you to place elements on top of each other, top is mean in like a three dimensional space. really overlapping each other. 
+
+<br><br>
+
+## 18. fold()
+
+return a new value which will be added to this starting value, for every run on every item in groups. 
+we received two arguments - the first argument is the currently calculated sum, the second argument is the element
+
+```
+double get maxSpending {
+  return groupTransactionValue.fold(0.0, (sum, item) => sum + item['amount']);
+}
+```
