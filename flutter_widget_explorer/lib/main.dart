@@ -12,7 +12,23 @@ class MyApp extends StatelessWidget {
       title: 'Personal Expenses',
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
-        accentColor: Colors.amber
+        accentColor: Colors.amber,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+          headline6: TextStyle(
+            fontFamily: 'Open Sans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold
+          )),
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+            headline6: TextStyle(
+              fontFamily: 'Open Sans', 
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ), 
+          )
+        ),
       ),
       home: MyHomePage(),
     );
@@ -26,8 +42,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [
-    Transaction(id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
-    Transaction(id: 't2', title: 'Weekly Groceries', amount: 16.53, date: DateTime.now()),
+    // Transaction(id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
+    // Transaction(id: 't2', title: 'Weekly Groceries', amount: 16.53, date: DateTime.now()),
   ];
 
   // private method
@@ -50,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Personal Expenses'),
+        title: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
         actions: [
           IconButton(icon: Icon(Icons.add), onPressed: () => startAddNewTransaction(context))
         ],

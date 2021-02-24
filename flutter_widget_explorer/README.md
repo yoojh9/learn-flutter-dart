@@ -416,4 +416,138 @@ return MaterialApp(
 )
 ```
 
+<br><br>
+
+## 15. Custom Fonts & Working with Text Theme
+First of all you need to create a new folder in your project folder so no into lib forder.
+Typically you name it something like assets or you directly name it fonts whatever you want.
+
+to include font file in our app, you need to go to pubspect.yaml file which is your global management tool. in pubspect.yaml file you should commented out area which already gives you an example of how to add fonts. so you can simply comment back in by removing the hash symbols.
+
+If you're adding a new fonts and you're downloading that from some resource like Google Fonts which is a web page then there you should find some information about which weight your font has.
+
+```
+[pubspect.yaml]
+  fonts:
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/OpenSans-Regular.ttf
+        - asset: assets/fonts/OpenSans-Bold.ttf
+          weight: 700
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-Regular.ttf
+        - asset: assets/fonts/Quicksand-Bold.ttf
+          weight: 700
+        
+```
+
+you can set such a global font in your theme, in the ThemeData you can set a fontFamily and you can set this to Quicksand
+
+```
+[main.dart]
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Personal Expenses',
+      theme: ThemeData(
+        primarySwatch: Colors.lightGreen,
+        accentColor: Colors.amber,
+        fontFamily: 'Quicksand'
+      ),
+      home: MyHomePage(),
+    );
+  }
+  ...
+}
+```
+
+AppBar Title TextStyle을 바꾸는 두가지 방법
+
+- on this text widget, you could add a style and that would be a text style. (Scaffold AppBar Title에 직접 적용 - locally)
+
+```
+[main.dart]
+
+class _MyHomePageState extends State<MyHomePage> {
+ @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
+        actions: [
+          IconButton(icon: Icon(Icons.add), onPressed: () => startAddNewTransaction(context))
+        ],
+      ),
+      body: ...
+    )
+  }
+}
+```
+
+- MaterialApp에 appBarTheme을 설정한다(globally)
+
+```
+[main.dart]
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Personal Expenses',
+      theme: ThemeData(
+        primarySwatch: Colors.lightGreen,
+        accentColor: Colors.amber,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+          headline6: TextStyle(
+            fontFamily: 'Open Sans',
+            fontSize: 18,
+            fontWeight: FontWeight.bold
+          )),
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+            headline6: TextStyle(
+              fontFamily: 'Open Sans', 
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ), 
+          )
+        ),
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+```
+
+위에서 global로 설정한 textTheme을 다른데서 사용하고 싶다면 아래와 같이 설정한다
+
+```
+Text(
+ '텍스트',
+  Theme.of(context).textTheme.headline6
+)
+
+```
+
+<br><br>
+
+## 16. Adding Images to the App
+
+### 1) 프로젝트 내에 있는 이미지 가져오기
+
+**Image.asset()**: it's provided as an asset in our project. you need to include image path in pubspect.yaml file
+**Image.file()**: file would be good for image that are in files that you obtained in a different ways
+**Image.network()**: if you have a URL for the image, so it it's not stored as part of your project  
+
+### 2) BoxFit enum
+
+<image src="./images/boxfit_1.png" width="700">
+
+<image src="./images/boxfit_2.png" width="700">
+
+<image src="./images/boxfit_3.png" width="700">
 
