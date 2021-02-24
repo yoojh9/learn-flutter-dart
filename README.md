@@ -4,3 +4,5 @@
 
 - [1. Flutter Introduction](./flutter_introduction)
 - [2. Flutter Basics](./flutter_complete_guide)
+- [3. Flutter Widgets](./flutter_widget_explorer)
+
