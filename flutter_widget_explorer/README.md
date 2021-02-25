@@ -570,3 +570,95 @@ double get maxSpending {
   return groupTransactionValue.fold(0.0, (sum, item) => sum + item['amount']);
 }
 ```
+
+<br><br>
+
+## 19. Flexible
+
+```
+  Flexible(
+    fit: FlexFit.tight,
+    child: ChartBar(data['day'], data['amount'], totalSpending == 0.0 ? 0.0 : (data['amount'] as double) / totalSpending)
+  )
+```
+
+<br><br>
+
+## 20. FittedBox
+FittedBox widget forces it child into the available space. and if that child is a text, it even shrinks the text.  
+So it creates a widget that scales and positions its child withing itself
+
+
+<br><br>
+
+## 21. Padding
+if you only need padding property, just use Padding widget.
+
+<br><br>
+
+## 22. Flexible & Expanded
+**Flexible**
+inside of a column or a row, every item is just as big as need to be. however you want to tell an item to take up more space in that row or column than it would normally take.
+and you can do that by wrapping it with a widget named Flexible.
+
+- fit : default is FlexFit.loose. It means that the child of that flexible item basically should keep its size and use that size in the surrounding row or column. 
+other option is FlexFit.tight. It is force the child to fill the available space. 
+
+- flex: if we hava 5 and 2 here, this means this is 5 to 2 in terms of how much space it takes. we have a total of seven segments into which the available remaining space is split up and one container takes 5 of these 7 segments, the other container has 2 of these 7 segments.  
+
+**Expanded** is simply flexible with Flexfit.tight and therefore, expanded has no fit argument, instead expanded only knows the flex configuration which we used on flexible.
+So if you need Flexible.tight, instead of using flexible with that configuration, you could simply use expanded instead. 
+
+```
+Expanded(
+  flex: 5,
+)
+```
+
+<br><br>
+
+## 23. Adding a ListTile widget
+ListTile built into FLutter and and that's a nicely preconfigured and styled widget with a certain layout that fits particularly well into List.
+in ListTile you can set up a leading widget which means a widget that is positioned at the beginning of that ListTile 
+
+<br><br>
+
+## 24. Widgets & Configuring Widgets - Summary / Overview
+- Padding
+- CircleAvatar : replaced with a container which you manually turn into a circle shape. 아래 코드처럼 Container로도 대체할 수는 있음.
+
+```
+Container(
+  height: 60,
+  width: 60,
+  decoration: BoxDecoration(
+    color: Theme.of(context).primaryColor,
+    shape: BoxShape.circle
+  ),
+),
+```
+
+<br><br>
+
+## 25. Date Selection
+Flutter에서 제공해주는 함수
+
+context argument는 showDatePicker를 호출하는 클래스가 State 클래스이므로 이미 context를 global로 가지고 있어, context를 그냥 넘겨주면 된다.
+in that state class which is connected to our new transaction widget, we have that global context property, so we can just use that.
+
+```
+showDatePicker(context: null, initialDate: null, firstDate: null, lastDate: null);
+```
+
+<br><br>
+
+## 26. Future
+showDatePicker()는 return 값으로 Future<DateTime>를 전달한다.
+Future is class that allow us to create object which will give us a value in the future.
+So you use future for example also for HTTP requests where you need to wait for response to come back from the server.
+here we wait for the user to pick a value, so show date picker, immediately when we call it returns a future but it can't immediately give us the date the user picked right because we just opened the picker, we don't know when the user is going to choose a date and click.  
+
+on a future we can add the 'then' method. 'Then' simply allows us to provide a function which is executed once the future resolves to a value,
+
+
+더 많은 정보는 [위젯 카탈로그](https://flutter-ko.dev/docs/development/ui/widgets)를 참조.

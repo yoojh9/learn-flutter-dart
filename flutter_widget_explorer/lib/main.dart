@@ -14,13 +14,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.lightGreen,
         accentColor: Colors.amber,
+        errorColor: Colors.red,
         fontFamily: 'Quicksand',
         textTheme: ThemeData.light().textTheme.copyWith(
           headline6: TextStyle(
             fontFamily: 'Open Sans',
             fontSize: 18,
             fontWeight: FontWeight.bold
-          )),
+          ),
+          button: TextStyle(color: Colors.white),
+        ),
         appBarTheme: AppBarTheme(
           textTheme: ThemeData.light().textTheme.copyWith(
             headline6: TextStyle(
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
               fontSize: 20,
               fontWeight: FontWeight.bold
             ), 
-          )
+          ),
         ),
       ),
       home: MyHomePage(),
@@ -54,16 +57,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // private method
-  void _addNewTransaction(String txTitle, double txAmount){
-    final newTransaction = Transaction(title: txTitle, amount: txAmount, date: DateTime.now(), id: DateTime.now().toString());
+  void _addNewTransaction(String txTitle, double txAmount, DateTime chosenDate){
+    final newTransaction = Transaction(
+      title: txTitle, 
+      amount: txAmount, 
+      date: chosenDate,
+      id: DateTime.now().toString()
+    );
     
     setState(() {
       _transactions.add(newTransaction);
     });
-
   }
 
-  void startAddNewTransaction(BuildContext ctx){
+  void _deleteTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere((element) => element.id==id);
+    });
+  }
+
+  void _startAddNewTransaction(BuildContext ctx){
     showModalBottomSheet(context: ctx, builder: (_){
       return NewTransaction(_addNewTransaction);
     });
@@ -75,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
         actions: [
-          IconButton(icon: Icon(Icons.add), onPressed: () => startAddNewTransaction(context))
+          IconButton(icon: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context))
         ],
       ),
       body: SingleChildScrollView(
@@ -84,12 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Chart(_recentTransaction),
-              TransactionList(_transactions)
+              TransactionList(_transactions, _deleteTransaction)
             ],
           ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(child: Icon(Icons.add), onPressed: () => startAddNewTransaction(context),),
+      floatingActionButton: FloatingActionButton(child: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context),),
     );
   }
 }
