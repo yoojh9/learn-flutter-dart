@@ -228,3 +228,124 @@ So the best solution here might be to assign dynamically calculated heights to a
     }); 
   }
 ```
+
+
+## 5. Controlling the Device Orientation
+- simply don't allow landscape mode
+
+```
+[main.dart]
+
+void main() { 
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown, 
+      DeviceOrientation.portraitUp
+  ]);
+  runApp(MyApp());
+}
+```
+
+- Landscape 전용 widget을 만든다. 예를 들어 Chart는 Landscape 모드에서 toggle 버튼을 만들어 토글 버튼을 누를 때만 보여준다.
+
+<br><br>
+
+## 6. Finishing Landscape Mode
+landscape 모드에서는 여전히 이미지 크기로 인해 에러가 발생함.
+
+<image src="./images/landscape.png" width="400">
+
+이유는, TransactionList에서 이미지 height을 200으로 직접 설정했기 때문.
+
+```
+  @override
+  Widget build(BuildContext context) {
+    return transactions.isEmpty
+        ? Column(
+          children:[
+            Text('No transactions added yet!', style: Theme.of(context).textTheme.headline6,),
+            SizedBox(height: 10,),
+            Container(
+              height: 200,
+              child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover)
+            )
+          ]
+        )
+```
+
+TransactionList 클래스에서도 LayoutBuilder를 사용하여 문제를 해결해보자.
+
+```
+  @override
+  Widget build(BuildContext context) {
+    return transactions.isEmpty
+        ? LayoutBuilder(builder: (ctx, constraints){
+          return Column(
+            children:[
+              Text('No transactions added yet!', style: Theme.of(context).textTheme.headline6,),
+              SizedBox(height: 10,),
+              Container(
+                height: constraints.maxHeight * 0.6,
+                child: Image.asset('assets/images/waiting.png', fit: BoxFit.cover)
+              )
+            ]
+          );
+        }) 
+```
+
+<br><br>
+
+## 7. Showing Different Content Based on Device Orientation
+MediaQuery를 이용하여 orientation도 구할 수 있다.
+
+```
+[main.dart]
+  @override
+  Widget build(BuildContext context) {
+    final isLandScape = MediaQuery.of(context).orientation == Orientation.landscape
+```
+
+it's allows to add an 'if' statements here in that list.
+list에서는 if 문을 사용할 수 있음. 대신 {}는 사용하지 않음.
+
+```
+    if(!isLandScape) Container(
+    height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.3,
+    child: Chart(_recentTransaction)
+    ), 
+    if(!isLandScape) _transactionListWidget,
+    if(isLandScape) _showChart ? Container(
+    height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.3,
+    child: Chart(_recentTransaction)
+    )
+    :
+    _transactionListWidget
+```
+
+So this is now how we can also render different content based on the orientation 
+
+<br><br>
+
+## 8. Respecting the Softkeyboard Insets
+smaller screen or landscape mode we can't really type and we constantly have to close the keyboard to get to the other inputs.
+thankfully, Flutter provides us with the tool to work around that issue and find out how much space is occupied by that soft keyboard and actually move that entire box up by that space. so we can still type in there.
+
+<image src="./images/landscape_softkey.png" width="500">
+
+<br>
+
+that tell us how much space is occupied by that keyboard. and I want to adjust the bottom padding by that space +10 which should always there to lift upward, to move up my entire input area.
+
+```
+[new_transaction.dart]
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      child: Container(
+        padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+```
+
+but, if I now tap in there, you see we have that bottom overflow problem. and that simply happens because that general modal sheet has the height it has.
+<image src="./images/softkey_up.png" width="300">

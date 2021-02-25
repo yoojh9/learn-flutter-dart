@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import './widgets/transaction_list.dart';
 import './widgets/new_transaction.dart';
 import './widgets/chart.dart';
 import './models/transaction.dart';
 
-void main() => runApp(MyApp());
+void main() { 
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitDown, 
+  //   DeviceOrientation.portraitUp
+  // ]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -45,6 +53,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _showChart = false;
+
   final List<Transaction> _transactions = [
     // Transaction(id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
     // Transaction(id: 't2', title: 'Weekly Groceries', amount: 16.53, date: DateTime.now()),
@@ -84,12 +94,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandScape = MediaQuery.of(context).orientation == Orientation.landscape;
     final appBar =  AppBar(
         title: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
         actions: [
           IconButton(icon: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context))
         ],
       );
+
+    final _transactionListWidget = Container(
+      height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.7,
+      child: TransactionList(_transactions, _deleteTransaction)
+    );
+    
     return Scaffold(
       appBar: appBar,
       body: SingleChildScrollView(
@@ -97,14 +114,29 @@ class _MyHomePageState extends State<MyHomePage> {
             //mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Container(
+              if(isLandScape) Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Switch(value: _showChart, onChanged: (value){
+                    setState(() {
+                      _showChart = value;
+                    });
+                  })
+                ]
+              ),
+
+              if(!isLandScape) Container(
                 height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.3,
                 child: Chart(_recentTransaction)
-              ),
-              Container(
-                height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.7,
-                child: TransactionList(_transactions, _deleteTransaction)
+              ), 
+              if(!isLandScape) _transactionListWidget,
+              if(isLandScape) _showChart ? Container(
+                height: (MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top) * 0.3,
+                child: Chart(_recentTransaction)
               )
+              :
+              _transactionListWidget
+
             ],
           ),
       ),
