@@ -5,5 +5,5 @@
 - [1. Flutter Introduction](./flutter_introduction)
 - [2. Flutter Basics](./flutter_complete_guide)
 - [3. Flutter Widgets](./flutter_widget_explorer)
-- [4. Responsive & Adaptive UI](./responsive_adpative_ui)
+- [4. Responsive & Adaptive UI](./responsive_adaptive_ui)
 
