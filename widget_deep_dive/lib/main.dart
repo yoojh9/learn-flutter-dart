@@ -95,8 +95,49 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  List<Widget> _buildLandscapeContent(
+    MediaQueryData mediaQueryData, 
+    PreferredSizeWidget appBar,
+    Widget transactionListWidget) {
+    return [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Show Chart', style: Theme.of(context).textTheme.headline6,),
+            Switch.adaptive(
+              activeColor: Theme.of(context).accentColor,
+              value: _showChart, 
+              onChanged: (value){
+                setState(() {
+                  _showChart = value;
+                });
+              })
+          ]
+        ),
+        _showChart ? Container(
+            height: (mediaQueryData.size.height - appBar.preferredSize.height - mediaQueryData.padding.top) * 0.7,
+            child: Chart(_recentTransaction)
+          )
+          :
+          transactionListWidget
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(
+    MediaQueryData mediaQueryData, 
+    PreferredSizeWidget appBar,
+    Widget transactionListWidget) {
+    return [
+        Container(
+          height: (mediaQueryData.size.height - appBar.preferredSize.height - mediaQueryData.padding.top) * 0.3,
+          child: Chart(_recentTransaction)
+        ), transactionListWidget 
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('build() MyHomepageState');
     final mediaQuery = MediaQuery.of(context);
     final isLandScape = mediaQuery.orientation == Orientation.landscape;
 
@@ -130,33 +171,9 @@ class _MyHomePageState extends State<MyHomePage> {
             //mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if(isLandScape) Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Show Chart', style: Theme.of(context).textTheme.headline6,),
-                  Switch.adaptive(
-                    activeColor: Theme.of(context).accentColor,
-                    value: _showChart, 
-                    onChanged: (value){
-                      setState(() {
-                        _showChart = value;
-                      });
-                    })
-                ]
-              ),
-
-              if(!isLandScape) Container(
-                height: (mediaQuery.size.height - _appBar.preferredSize.height - mediaQuery.padding.top) * 0.3,
-                child: Chart(_recentTransaction)
-              ), 
-              if(!isLandScape) _transactionListWidget,
-              if(isLandScape) _showChart ? Container(
-                height: (mediaQuery.size.height - _appBar.preferredSize.height -mediaQuery.padding.top) * 0.7,
-                child: Chart(_recentTransaction)
-              )
-              :
-              _transactionListWidget
-
+              if(isLandScape) ... _buildLandscapeContent(mediaQuery, _appBar, _transactionListWidget),
+              if(!isLandScape) ... _buildPortraitContent(mediaQuery, _appBar, _transactionListWidget),
+              //if(!isLandScape) _transactionListWidget,
             ],
           ),
       )

@@ -7,7 +7,9 @@ class Chart extends StatelessWidget {
 
   final List<Transaction> recentTransactions;
 
-  Chart(this.recentTransactions);
+  Chart(this.recentTransactions) {
+    print('Constuctor Chart');
+  }
 
   List<Map<String, Object>> get groupTransactionValue {
     // generate: List를 생성해줌
@@ -24,9 +26,7 @@ class Chart extends StatelessWidget {
         }
         
       }
-      
-      print(DateFormat.E().format(weekDay));
-      print(totalSum);
+    
 
       return {'day': DateFormat.E().format(weekDay), 'amount': totalSum};
     
@@ -39,6 +39,7 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('build() Chart');
     return Card(
         elevation: 6,
         margin: EdgeInsets.all(20),

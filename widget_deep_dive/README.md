@@ -59,6 +59,92 @@ This element tree which is not rebuild whenever build() is called, only the widg
 calling build() does not mean that the entire screen re-renders becuase Flutter has a couple of layers to manage that and calling build or the build() being called only menas that this widget tree, so that tree of configuration data rebuild or parts of tree rebuild.
 and therefore Flutter checks which parts on the real screen need to be updated.
 
+**Widget Tree**: Provide configuration for element and render tree.
+**Element Tree**: Connect widget and render tree, manage state, updatee render tree when widget tree changes.
+
 <br><br>
 
-## 4. How Flutter Executes build()
+## 4. Using "const" widgets & Constuctors
+Even though rebuilds of the widget aren't that bad, of course it's never a bad idea to avoid unnecessary widget rebuilds becuase that simply means that even though it's just a configuration tree that changes, even if we can avoid a change there, we save some processing time and therefore, can overall improve our application preformance.
+One relatively easy improvement is the usage of "const" constuctors and "const" widgets.
+
+### 1) const constructor
+we can't make this a const constuctor for non-final fields. 
+const constuctor means every instance of this object you create is immuatble, you can't change it.
+basically all your StatelessWidget are theoretically immutable 
+
+```
+class ChartBar extends StatelessWidget {
+  final String label;
+  final double spendingAmount;
+  final double spendingPercentageOfTotal;
+
+  const ChartBar(this.label, this.spendingAmount, this.spendingPercentageOfTotal);
+
+}
+```
+
+<br><br>
+
+
+## 5. Using Builder Methods
+List<Widget>은 ...(spread operator)를 이용하여 List를 분리할 수도 있다.
+These Three dot tell Dart that you want to pull all the elements out of that list and merge them as single elements into that surrounding list which we have.
+So instead of adding a list to a list, we're adding all the elements of this list as single items next to each other.
+
+```
+  List<Widget> _buildLandscapeContent(
+    MediaQueryData mediaQueryData, 
+    PreferredSizeWidget appBar,
+    Widget transactionListWidget) {
+    return [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Show Chart', style: Theme.of(context).textTheme.headline6,),
+            Switch.adaptive(
+              activeColor: Theme.of(context).accentColor,
+              value: _showChart, 
+              onChanged: (value){
+                setState(() {
+                  _showChart = value;
+                });
+              })
+          ]
+        ),
+        _showChart ? Container(
+            height: (mediaQueryData.size.height - appBar.preferredSize.height - mediaQueryData.padding.top) * 0.7,
+            child: Chart(_recentTransaction)
+          )
+          :
+          transactionListWidget
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(
+    MediaQueryData mediaQueryData, 
+    PreferredSizeWidget appBar,
+    Widget transactionListWidget) {
+    return [
+        Container(
+          height: (mediaQueryData.size.height - appBar.preferredSize.height - mediaQueryData.padding.top) * 0.3,
+          child: Chart(_recentTransaction)
+        ), transactionListWidget 
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
+        child: Column(
+            //mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              if(isLandScape) ... _buildLandscapeContent(mediaQuery, _appBar, _transactionListWidget),
+              if(!isLandScape) ... _buildPortraitContent(mediaQuery, _appBar, _transactionListWidget),
+              //if(!isLandScape) _transactionListWidget,
+            ],
+            ...
+        )
+  }
+```
