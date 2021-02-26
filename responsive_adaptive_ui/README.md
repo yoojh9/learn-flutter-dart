@@ -580,7 +580,9 @@ iOS 일 때는 MaterialApp 대신 CupertinoApp으로 render 되도록 변경한�
 **CupertinoTextField** : we can also replcae the text fields with Cupertino text fields.  
 **CupertinoButton**: instead of FlatButton
 
-----
+<br><br>
+
+--
 
 - https://stackoverflow.com/questions/49704497/how-to-make-flutter-app-responsive-according-to-different-screen-size?rq=1
 - [More on LayoutBuilder](https://api.flutter.dev/flutter/widgets/LayoutBuilder-class.html)
