@@ -225,4 +225,4 @@ flutter: dispose()
 <br> 
 **dispose()** is greate for cleaning up data
 
-Let's say you have a listener to a real time Internet connection which sends you new messages because you're buidling a chat application or anything like that, then you want to clean up this connection to youre dispose()
+Let's say you have a listener to a real time Internet connection which sends you new messages because you're buidling a chat application or anything like that, then you want to clean up this connection to your server here when your widget is removed, so that you don't have that ongoing connection in memory even though you have no widget anymore, this will lead to strange bugs and also to memory leaks. So cleaning up listeners or life connection, that is something you would often do in dispose
