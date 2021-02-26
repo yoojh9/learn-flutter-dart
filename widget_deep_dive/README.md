@@ -44,13 +44,13 @@ Quering the current media using[MediaQuery.of] will cause your widget to rebuild
 
 for example when you rotate the device, the MediaQueryData changes becuase orientation is information stored in the MediaQueryData therefore rotating your device automatically also triggers build to run. The same is if the soft keyboard appears.
 
-<image src="./images/mediaQuery.png" width="300">
+<image src="./images/mediaQuery.png" width="500">
 
 <br><br>
 
 ## 3. How Flutter Rebuilds & Repaints the Screen
 
-<image src="./images/widget-element-tree" width="700">
+<image src="./images/widget-element-tree.pnt" width="700">
 
 In our stateful widget, we call setState(), so something changes there.
 
