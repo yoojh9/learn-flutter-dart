@@ -253,7 +253,7 @@ void main() {
 ## 6. Finishing Landscape Mode
 landscape 모드에서는 여전히 이미지 크기로 인해 에러가 발생함.
 
-<image src="./images/landscape.png" width="400">
+<image src="./images/landscape.png" width="500">
 
 이유는, TransactionList에서 이미지 height을 200으로 직접 설정했기 때문.
 
