@@ -148,3 +148,81 @@ So instead of adding a list to a list, we're adding all the elements of this lis
         )
   }
 ```
+
+<br><br>
+
+
+## 6. Widget Lifecycle
+For Stateful Widget we also have the constructor function, we also have create state beeing called to create that state object.
+Inside of state object, you can add an initState() method which will be called automatically, that is executed automatically by Flutter when the state object is created for the first time.
+and Remember that the state object is managed independently of the widget, so when the widget is rebuild, initState() will not run again. it only runs when the state is created for the first time.
+
+Thereafter, we have the build() method which executes. Now you can always call setState() to update the widget.
+Then didUpdateWidget() executes. and thereafter again, build() run.
+
+if a widget is destroyed, if it's removed because you rendered its condition is false, then dispose() is called. 
+So all these special methods, initState, didUpdateWidget, dispose are all methods you can add to your state object and they run when the state is created, when the attached widget changed or when the state object is cleared, is removed.
+
+
+ <image scr="./images/widget_lifecycle.png" width="700">
+
+ ### 1) initState()
+ official docs tell that state that you should call super.initState() first, and therfore put your code after super.initState() not before it. However it actually won't make a difference. 
+
+ ### 2) didUpdateWidget()
+ This gets called when the widget is attached to the state changes and then Flutter actually gives you the old widget
+ so that you could compare it to the new widget becuase you have that special widget property('widget') which you can use in your state. The 'widget' will now automatically refer to the updated widget, 
+ ```
+ [new_transaction.dart]
+   @override
+  void didUpdateWidget(covariant NewTransaction oldWidget) {
+    // TODO: implement didUpdateWidget
+    // widget 과 oldWidget 비교할 수 있음.
+    super.didUpdateWidget(oldWidget);
+  }
+ ```
+
+ NewTransaction 위젯에 lifecycle 마다 로그를 찍어보았다.
+ + 버튼을 눌러 ModalBottomSheet가 뜨게 해보자.
+
+ <image src="./images/widget_lifecycle_log.png" width="400">
+
+ ```
+  flutter: Constuctor NewTransaction Widget
+  flutter: CreateState NewTransaction Widget
+  flutter: Constuctor NewTransaction State
+  flutter: initState()
+
+  flutter: Constuctor NewTransaction Widget
+  flutter: didUpdateWidget()
+
+ ```
+
+what we see now also is that createState is not called again and therefore, the constructor of the State and initState() is not called again. becuase The state is managed as a seperate object and when the widget rebuilds, the state is not recreated automatically.
+
+didUpdateWidget() is executed because the widget attached to the state was replaced.
+
+Now when I close this by clicking somewhere on the backdrop, you can see that it recreates this widget, and then didUpdateWidget() in the end, you see dispose() is called once.
+
+The render object is removed because that needs to be removed, you don't want to see it on the screen anymore.
+and dispose is called because when the element is cleared, the state object is cleared as well and therefore removed.
+
+
+```
+flutter: Constuctor NewTransaction Widget
+flutter: didUpdateWidget()
+
+flutter: dispose()
+
+```
+<br>
+
+**initState()** is often used for fetching some initial data you need in your app or in a widget of your app.
+<br>
+
+**didUpdateWidget()** is probably used way less often, you could use it if you know something changed in your parent widget and you need to refetch data in your state. so if you're fetching data from a database, you want to fetch new Data, you could do this here in didUpdatWidget() with the information.
+
+<br> 
+**dispose()** is greate for cleaning up data
+
+Let's say you have a listener to a real time Internet connection which sends you new messages because you're buidling a chat application or anything like that, then you want to clean up this connection to youre dispose()
