@@ -548,7 +548,7 @@ CupertinoNavigationBar(
 
 This is now the default iOS look and it's not that green appBar.
 
-<image src="./images/ios_look.png" width="200">
+<image src="./images/ios_look.png" width="300">
 
 But that's not really looking that good, the chart is now below our navigation bar. 
 so somehow this calculation of the navigation bar height is not working out correctly.
@@ -561,13 +561,13 @@ we can use a special widget which is built into Flutter, the **SafeArea** Widget
 We simply Wrap our body, in this case the SingleChildScrollView, with that widget.
 This menas that make sure everything is positioned within the boundaries or moved down a bit, moved up a bit so that we consider these reserved areas on the screen. now everyting is positioned correctly.
 
-<image src="./images/safearea.png" width="200">
+<image src="./images/safearea.png" width="300">
 
 <br><br>
 
 ## 14. More Cupertino Styles
 
-<image src="./images/more_cupertino_style.png" width="400">
+<image src="./images/more_cupertino_style.png" width="500">
 
 The reason for that is that since we're now in a CupertinoPageScaffold, we don't automatically get a theme assigned to our text here. A suolution can be to also switch our general app widget, which we have all the way at the top of the main.dart file, here the material app for a Cupertino app widget.
 
