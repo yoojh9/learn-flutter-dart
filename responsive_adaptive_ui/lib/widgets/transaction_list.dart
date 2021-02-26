@@ -41,15 +41,20 @@ class TransactionList extends StatelessWidget {
                   ),
                   title: Text(transactions[index].title, style: Theme.of(context).textTheme.headline6,),
                   subtitle: Text(DateFormat.yMMMd().format(transactions[index].date)),
-                  trailing: IconButton(
+                  trailing: MediaQuery.of(context).size.width > 400 ? FlatButton.icon(
+                      textColor: Theme.of(context).errorColor,
+                      onPressed: () => deleteTransaction(transactions[index].id),
+                      icon: Icon(Icons.delete), 
+                      label: Text('delete'))
+                    : IconButton(
                     icon: Icon(Icons.delete),  
                     color: Theme.of(context).errorColor, 
                     onPressed: () => deleteTransaction(transactions[index].id)
-                    ),
+                  ),
                 ),
               );
             },
             itemCount: transactions.length,
         );
   }
-}
+}  

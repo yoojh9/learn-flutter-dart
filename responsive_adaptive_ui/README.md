@@ -347,5 +347,241 @@ that tell us how much space is occupied by that keyboard. and I want to adjust t
         padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: MediaQuery.of(context).viewInsets.bottom + 10),
 ```
 
-but, if I now tap in there, you see we have that bottom overflow problem. and that simply happens because that general modal sheet has the height it has.
+but, if I now tap in there, you see we have that bottom overflow problem. and that simply happens because that general modal sheet has the height it has. Now to work around that, we can simply wrap this entire card into a SingleChildScrollView, 
 <image src="./images/softkey_up.png" width="300">
+
+<br>
+
+so now if i tap in there, now we can scroll everything into view and that's certainly better than the solution we had before
+
+<br><br>
+
+## 9. Using the Device Size in Conditions
+if we have more width available, may be we want to show more information that on smaller screens. 
+The concrete example I have in mind is that we could show some helper text next to that trash icon.
+이 예제에서는 orientation이 landscape 기준일 때 보이는게 아니라 width 기준으로 width가 넓으면 trash icon 옆에 text가 보이도록 만들어본다.
+
+I really only cared about the available width not about the orientation. so even if we are in portrait mode but let's say we have a very large device, then I might still want to show that text. 
+we can also use the size and there the width in a condition.
+
+```
+  trailing: MediaQuery.of(context).size.width > 400 ? FlatButton.icon(
+      textColor: Theme.of(context).errorColor,
+      onPressed: () => deleteTransaction(transactions[index].id),
+      icon: Icon(Icons.delete), 
+      label: Text('delete'))
+    : IconButton(
+    icon: Icon(Icons.delete),  
+    color: Theme.of(context).errorColor, 
+    onPressed: () => deleteTransaction(transactions[index].id)
+```
+
+<br><br>
+
+## 10. Managing the MediaQuery Object
+MediaQuery.of(context)를 중복해서 사용한다면, build()메소드 아래에 final mediaQuery = MediaQuery.of(context); 로 변수를 지정해서 변수를 사용한다.
+
+if you set up one connection, get the media query data once and store that in one object and then you reuse that object throughout your widget tree or throughout your build method which is more efficient.
+whenever this is rebuilt becuase the orientation changed for example, then build will run again and threfore, you will create a new variable with a new value. so defining media query variable at build() makes sense.
+
+<br><br>
+
+## 11. Checking the Device Platform
+we'll dive into creating adaptive user interfaces where we still work in one and the same codebase but now we do it such that we actually build a different user interface regarding its styling and the look and feel for iOS.
+
+If you have that switch there, you can easily get the iOS look by going to the place where you're using the switch.
+for some widget, like the Switch and the official docs tell you when that is available, you can use a speacial constuctor, the adaptive constuctor, It takes the same configuration as the normal switch but the difference here is that it automatically adjusts the look based on the platform. 
+
+widget that looks more iOS-like on iOS and doesn't have the default material look. 
+
+```
+Switch.adaptive(
+  activeColor: Theme.of(context).accentColor,
+  value: _showChart, 
+  onChanged: (value){
+    setState(() {
+      _showChart = value;
+    });
+  })
+```
+
+<br>
+
+<image scr="./images/ios-styled.png" width="400">
+
+Switch.adaptive()를 통해 iOS 스타일의 Switch 버튼으로 변경된 것을 볼 수 있다.
+
+<br>
+
+FloatingButton을 iOS 스타일로 변경하고 싶으면 어떻게 해야할까?
+dart:io를 다른 패키지들보다 가장 상단에 import 시킨다. 
+
+```
+floatingActionButton: Platform.isIOS 
+  ? Container() 
+  : FloatingActionButton(child: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context),),
+```
+
+the Platform is very useful and it allows you to check for a broad variety of platforms.
+
+<br><br>
+
+## 12. Using Cupertino (iOS) widget
+### 1) CupertinoPageScaffold
+What about other things like the appBar or the general look of this page? By deault, we have the material design becuase we're using in our main.dart file, in the build method is this scaffold.
+the scaffold widget by default gives us a page for material design widgets.
+There also is a Cupertino and iOS version. we have the **CupertinoPageScaffold** 
+
+You need to add an import to package:flutter/cupertino.dart just as we used material.dart
+
+```
+import 'package:flutter/cupertino.dart';
+
+
+
+@override
+Widget build(){
+  final _appBar =  Platform.isIOS 
+     ? CupertinoNavigationBar(
+        middle: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
+        trailing: Row(children: [
+         GestureDetector(
+           child: Icon(CupertinoIcons.add),
+           onTap: () => _startAddNewTransaction(context),
+         )
+       ],),
+     )
+    
+     : AppBar(
+        title: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
+        actions: [
+          IconButton(icon: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context))
+        ],
+    );
+  ...
+
+  return Platform.isIOS 
+    ? CupertinoPageScaffold(
+      navigationBar: _appBar,
+      child: _pageBody
+      )
+    :Scaffold(
+      appBar: _appBar,
+      body: _pageBody,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Platform.isIOS 
+        ? Container() 
+        : FloatingActionButton(child: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context),),
+    );
+}
+```
+<br>
+
+### 2) CupertinoNavigationBar
+CupertinoPageScaffold 'navigationBar' property is instead of appBar in scaffold.
+we actually use [CupertinoNavigationBar](https://api.flutter.dev/flutter/cupertino/CupertinoNavigationBar-class.html).
+
+
+위처럼 추가할 경우 _appBar.preferredSize에서 에러가 발생한다.
+that actually is taken from the appBar and I want to calculate the preferred size for both my CupertinoNavigationBar as well as for this appBar. Now small problem is that I'm getting an error that preffered size is not defined on widget.
+The reason for that is actually that appBar is inferred to be of type widget. Now that simply happens becuase Dart is not able to find out that CupertinoNavigationBar and appBar both have a preferred size property. but actually, if we add a dot after CupertinoNavigationBar, we see there is a preferred size property.
+
+<br>
+위 문제를 해결하기 위해 final appBar에 type을 추가해준다.
+that's one of the cases where it make sense to explicitly set the type. 
+if you known what the type, but Dart can't find out. and set this to PreferredSizeWidget.
+Now you get rid of these type erros down 
+
+```
+final PreferredSizeWidget 
+```
+
+CupertinoPageScaffold doesn't have title property so instead, you target the **middle** property.
+
+of course, you also want to add some actions in CupertinoNavigationBar. use **trailing** property instead of actions to add some content at the end of the bar. 
+
+<br>
+
+CupertinoNavigationBar trailing에 AppBar의 actions처럼
+
+```
+IconButton(icon: Icon(Icons.add), onPressed: () => _startAddNewTransaction(context))
+```
+
+IconButton을 추가하면 에러가 발생하는데, 그 이유는 IconButton Widget이 material widget을 필요로 하기 때문이다. 
+IconButton widget requires a material widget ancestor. The problem is that we added an IconButton widget which is defined for material design inside of our CupertinoNavigationBar, inside our CupertinoPageScaffold. 
+As the error message tells us, material widgets and the IconButton is one of them look for some parent widgets somewhere which implements material design and that's missing here.
+But there is no CupertinoIconButton, one thing we can do is we can build our own button. we can add a GestureDetector instead of IconButton.
+
+GestureDetector에는 child 프로퍼티에 Icon 위젯을 사용한다. Icon is not a material design. so we could use icons.add.
+
+```
+child: Icon(Icons.add) -- X
+```
+
+but actually to have that full iOS look. we might want to use CupertinoIcons which exists at
+
+<br>
+
+### 3) MainAxisSize
+이 상태로 두면 CupertinoNavigationBar에서 title은 보이지 않고 + 버튼만 보이는데, 이는 + 버튼이 속해있는 Row가 모든 영역을 차지하기 때문이다.
+이를 해결하기 위해 Row의 mainAxisSize 프로퍼티에 MainAxisSize.min을 추가한다
+
+
+By default, it takes all the width it cant get as a row and column takes all the height it can get.
+You can restrict and set it to MainAxisSize.min.
+if you set it to min, the row will shrink along its main axis, so from left to right, to be only as big as its children need to be and therefore now. 
+
+```
+CupertinoNavigationBar(
+  middle: Text('Personal Expenses', style: TextStyle(fontFamily: 'Open Sans'),),
+  trailing: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      GestureDetector(
+        child: Icon(CupertinoIcons.add),
+        onTap: () => _startAddNewTransaction(context),
+      )
+    ],),
+)
+```
+
+This is now the default iOS look and it's not that green appBar.
+
+<image src="./images/ios_look.png" width="200">
+
+But that's not really looking that good, the chart is now below our navigation bar. 
+so somehow this calculation of the navigation bar height is not working out correctly.
+
+<br><br>
+
+## 13. Using the SafeArea
+that simply means that some of the available space on the screen is reserved and can't be used for positioning the widgets.
+we can use a special widget which is built into Flutter, the **SafeArea** Widget.
+We simply Wrap our body, in this case the SingleChildScrollView, with that widget.
+This menas that make sure everything is positioned within the boundaries or moved down a bit, moved up a bit so that we consider these reserved areas on the screen. now everyting is positioned correctly.
+
+<image src="./images/safearea.png" width="200">
+
+<br><br>
+
+## 14. More Cupertino Styles
+
+<image src="./images/more_cupertino_style.png" width="400">
+
+The reason for that is that since we're now in a CupertinoPageScaffold, we don't automatically get a theme assigned to our text here. A suolution can be to also switch our general app widget, which we have all the way at the top of the main.dart file, here the material app for a Cupertino app widget.
+
+iOS 일 때는 MaterialApp 대신 CupertinoApp으로 render 되도록 변경한다.
+- ThemeData는 CupertinoThemeData로 변경한다.
+
+<br><br>
+
+## 15. Using Cupertino Buttons
+**CupertinoTextField** : we can also replcae the text fields with Cupertino text fields.  
+**CupertinoButton**: instead of FlatButton
+
+----
+
+- https://stackoverflow.com/questions/49704497/how-to-make-flutter-app-responsive-according-to-different-screen-size?rq=1
+- [More on LayoutBuilder](https://api.flutter.dev/flutter/widgets/LayoutBuilder-class.html)
+- [All cupertino widget](https://flutter.dev/docs/development/ui/widgets/cupertino)
