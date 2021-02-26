@@ -50,7 +50,7 @@ for example when you rotate the device, the MediaQueryData changes becuase orien
 
 ## 3. How Flutter Rebuilds & Repaints the Screen
 
-<image src="./images/widget-element-tree.pnt" width="700">
+<image src="./images/widget-element-tree.png" width="700">
 
 In our stateful widget, we call setState(), so something changes there.
 
