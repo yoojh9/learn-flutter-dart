@@ -230,3 +230,42 @@ class MyApp extends StatelessWidget {
 ```
 
 you can also add an initialRoute argument to your MaterialApp and the default value is just \'\/\' so you don't need to set this.
+
+<br><br>
+
+## 7. Displaying Recipe Items & Using Network Images
+Both are normal widgets, a Screen widget also is just a class that extends stateless or stateful widget.
+but the way we use these widgets is totally different. so it would make sense to create more sub-folders to make it clear which widgets and which files contain which kind of widget.
+
+we could add **widgets** sub-folder for these normal widgets which we include into other widgets(CategoryItem, MealItem) and **screens** is screen-like widgets (CategoriesScreen, CategoryMealsScreen)
+
+<image src="./images/structure.png" width="200">
+
+
+### 1) ClipRRect
+A widget that clips its child using a rounded rectangle.
+
+```
+ClipRRect(
+  borderRadius: BorderRadius.only(
+    topLeft: Radius.circular(15),
+    topRight: Radius.circular(15)
+  ),
+  child: Image.network(imageUrl, height: 250, width: double.infinity, fit: BoxFit.cover),
+)
+```
+
+<image src="./images/clipRRect.png" width="300">
+
+### 2) ClipRect
+for more efficient clips without rounded corners.
+
+### 3) ClipOval
+for an elliptical clip.
+
+<br><br>
+
+## 8. Finishing the Meal List Item
+Please note on every inage that we have rounded corners at the top but not at the bottom
+
+
