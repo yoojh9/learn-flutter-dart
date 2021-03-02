@@ -226,3 +226,85 @@ flutter: dispose()
 **dispose()** is greate for cleaning up data
 
 Let's say you have a listener to a real time Internet connection which sends you new messages because you're buidling a chat application or anything like that, then you want to clean up this connection to your server here when your widget is removed, so that you don't have that ongoing connection in memory even though you have no widget anymore, this will lead to strange bugs and also to memory leaks. So cleaning up listeners or life connection, that is something you would often do in dispose
+
+<br><br>
+
+
+## 7. Understanding the App Lifecycle
+There's a couple of diffrent licycle status, and the important question is when is this state reached, when can you execute code based on the state.
+
+for example you have the **inactive** state. Inactive means that your app is not even running in background, it's inactive, the user can't see it, it cant' receive user input. It's not fully cleared from memory yet but it's definitely not too active.
+
+A state can be reached on operating system is **paused**. this is when the app is not visible and when it's running in background, so when you can reach it through the task manager of your application. This is available on both Android and iOS and you can react to the app transitioning into that mode in your code, for example to do some last minute cleanup, clear some connection to a server or anything like that.  
+
+of course, since you have paused, you also have **resumed**. This state is reached when your app is coming back from the background mode if it's again visible and again responding to user input and this is also available both on Android and iOS.
+So this would be a good place to again set up a live connection to a server, check whether you want to change something in your app, fetch new data, anything like that 
+
+and there also is a **suspending** state which is when the app is about to be suspended, so when it's almost gone but still there but when it's about to be cleared by the operating system, when it's about to be removed from memory.
+
+<image src="./images/app_lifecycle.png" width="500">
+
+<br>
+
+### 1) mixin
+it's a bit like a class and it's a bit like extenidng a class but it adds a certain feature from that class you're mixing into your class, so you're adding certain properties, certain methods this other class has without fully inheriting other class. 
+you only can inherit from one class, so if you want to bring in features from multiple classes, you would use a mixin.
+You use a mixin by adding a **'with'** keyword after your class and after all your extensions
+
+<br>
+
+The new method you can add is didChangeAppLifecycleState, that is a method added by the mixin and therefore we add @Override to make clear the we deliberately override this. 
+So this method will be called whenever your licecyles state changes, whenever the app reaches a new state in lifecycle.
+
+You also want to clear that listener to lifecycle changes when that state object is not required anymore. So let's add dispose here with @Override and call super.dispose() and clear listeners to lifecycle changes. it you have ap bigger app and you add your app lifecycle listeners in just one child widget somewhere down the widget tree of your app because in that child widget you're interested in changes to the lifecycle of the app, 
+well then when the child widget gets removed, you certainly also want to clear your lifecycle listeners to avoid memory leaks.
+
+So in dispose, you clear all listeners you have to the app lifecycle. call WidgetsBinding.instance.removeObserver() in dispose()
+
+Now before you can remove it, you also need to set up a listener, so for this method to be triggered, you need to add a listener and you do this by adding initState() and there you now use widgets binding instance add Observer.
+
+'WidgetsBinding.instance.addObserver(this);' So with this line, you're saying or you're telling Flutter hey, whenever my lifecycle state changes, I want you to go to a certain observer and call the didChangeAppLifecycleState() method. 
+
+```
+[main.dart]
+
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+}
+```
+
+// 1) 앱 실행 후 홈버튼 눌렀을 때.
+this is just paused, it's running in background.
+
+```
+[console]
+flutter: AppLifecycleState.inactive
+flutter: AppLifecycleState.paused
+```
+
+// 2) task manager 열고 다시 app으로 돌아오면,
+basically during this switch, it goes into inactive but then it enters resume becuase not it's getting back from paused to running again
+``` 
+[console]
+flutter: AppLifecycleState.inactive
+flutter: AppLifecycleState.resumed
+```
+
+// 3) app을 task manager에서 완전히 날렸을 경우, 
