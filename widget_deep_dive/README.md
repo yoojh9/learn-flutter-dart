@@ -253,17 +253,17 @@ You use a mixin by adding a **'with'** keyword after your class and after all yo
 
 <br>
 
-The new method you can add is didChangeAppLifecycleState, that is a method added by the mixin and therefore we add @Override to make clear the we deliberately override this. 
+The new method you can add is **didChangeAppLifecycleState()**, that is a method added by the mixin and therefore we add @Override to make clear the we deliberately override this. 
 So this method will be called whenever your licecyles state changes, whenever the app reaches a new state in lifecycle.
 
 You also want to clear that listener to lifecycle changes when that state object is not required anymore. So let's add dispose here with @Override and call super.dispose() and clear listeners to lifecycle changes. it you have ap bigger app and you add your app lifecycle listeners in just one child widget somewhere down the widget tree of your app because in that child widget you're interested in changes to the lifecycle of the app, 
 well then when the child widget gets removed, you certainly also want to clear your lifecycle listeners to avoid memory leaks.
 
-So in dispose, you clear all listeners you have to the app lifecycle. call WidgetsBinding.instance.removeObserver() in dispose()
+So in dispose, you clear all listeners you have to the app lifecycle. call **WidgetsBinding.instance.removeObserver()** in dispose()
 
 Now before you can remove it, you also need to set up a listener, so for this method to be triggered, you need to add a listener and you do this by adding initState() and there you now use widgets binding instance add Observer.
 
-'WidgetsBinding.instance.addObserver(this);' So with this line, you're saying or you're telling Flutter hey, whenever my lifecycle state changes, I want you to go to a certain observer and call the didChangeAppLifecycleState() method. 
+**WidgetsBinding.instance.addObserver(this);** So with this line, you're saying or you're telling Flutter hey, whenever my lifecycle state changes, I want you to go to a certain observer and call the didChangeAppLifecycleState() method. 
 
 ```
 [main.dart]
@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 }
 ```
 
-// 1) 앱 실행 후 홈버튼 눌렀을 때.
+#### (1) 앱 실행 후 홈버튼 눌렀을 때.
 this is just paused, it's running in background.
 
 ```
@@ -299,12 +299,20 @@ flutter: AppLifecycleState.inactive
 flutter: AppLifecycleState.paused
 ```
 
-// 2) task manager 열고 다시 app으로 돌아오면,
+#### (2) task manager 열고 다시 app으로 돌아오면,
 basically during this switch, it goes into inactive but then it enters resume becuase not it's getting back from paused to running again
+
 ``` 
 [console]
 flutter: AppLifecycleState.inactive
 flutter: AppLifecycleState.resumed
 ```
 
-// 3) app을 task manager에서 완전히 날렸을 경우, 
+#### (3) app을 task manager에서 완전히 날렸을 경우, 
+
+``` 
+[console]
+flutter: AppLifecycleState.inactive
+flutter: AppLifecycleState.paused
+Lost connection to device.
+```
