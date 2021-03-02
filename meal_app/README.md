@@ -137,4 +137,96 @@ and you can imagine this list as being in a three-dimensional space where you al
 
 <br><br>
 
-## 5. Passing Data via the Constuctor
+## 5. Using Named Routes & Passing Data with Named Routes
+for that the main.dart file, you can set up **routes** argument. The route table takes a map where you have string keys which identify a route. And a route is really just a screen and the value after the colon your creating function for that screen. 
+
+```
+[main.dart]
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      ...
+      home: CategoriesScreen(),
+      routes: {
+        '/category-meals': (ctx) => CategoryMealsScreen()
+      },
+    );
+  }
+}
+
+```
+
+Tankfully though, Flutter also has a different mechanism of passing data between routes. Besides using the constuctor of the screen we're loading, it also has its own messaging system you could say, its own system for passing data. 
+
+일단, 기존 CategoryMealsScreen 클래스의 변수와 생성자 코드를 주석처리한다.
+
+category_item.dart 파일에서 MaterialPageRoute 대신 pushNamed를 사용한다.
+
+```
+[category_item.dart]
+  void selectCategory(BuildContext ctx){
+    Navigator.of(ctx).pushNamed(
+      '/category-meals', 
+      arguments:  {'id': id, 'title': title}
+    );
+  }
+```
+
+<br>
+
+How could we now extract the data in a CategoryMealsScreen? 
+
+```
+class CategoryMealsScreen extends StatelessWidget {
+  // final String categoryId;
+  // final String categoryTitle;
+  
+  // CategoryMealsScreen(this.categoryId, this.categoryTitle);
+
+  @override
+  Widget build(BuildContext context) {
+    final routeArgs = ModalRoute.of(context).settings.arguments as Map<String, String>;
+    final categoryTitle = routeArgs['title'];
+    final categoryId = routeArgs['id'];
+    
+    return Scaffold(
+      appBar: AppBar(title: Text(categoryTitle)),
+      body: Center(
+        child: Text(categoryTitle),
+      )
+    );
+  }
+}
+```
+
+
+<br><br>
+
+## 6. Diving Deeper into Named Routes
+'home' always also has an automatically named route which is just \'\/\'.
+and remove the home argument. 
+
+```
+[main.dart]
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      ...
+      // home: CategoriesScreen(),
+      routes: {
+        '/': (ctx) => CategoriesScreen(),
+        '/category-meals': (ctx) => CategoryMealsScreen()
+      },
+    );
+  }
+}
+
+```
+
+you can also add an initialRoute argument to your MaterialApp and the default value is just \'\/\' so you don't need to set this.
