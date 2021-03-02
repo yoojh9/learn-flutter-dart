@@ -239,7 +239,7 @@ but the way we use these widgets is totally different. so it would make sense to
 
 we could add **widgets** sub-folder for these normal widgets which we include into other widgets(CategoryItem, MealItem) and **screens** is screen-like widgets (CategoriesScreen, CategoryMealsScreen)
 
-<image src="./images/structure.png" width="200">
+<image src="./images/structure.png" width="400">
 
 
 ### 1) ClipRRect
