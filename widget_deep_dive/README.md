@@ -422,11 +422,11 @@ and I'll use initState() to set some dynamic data for this widget which is creat
   }
 ```
 
-<image src="./images/capture1.png" width="400">
+<image src="./images/capture1.png" width="300">
 
 test5 아이템을 지우면 test6 아이템이 파란색으로 변경되는 것을 볼 수 있다. 이는 widget이 지워져도 state는 남아있어 발생하는 문제이다.
 
-<image src="./images/capture2.png" width="400">
+<image src="./images/capture2.png" width="300">
 
 <br><br>
 
@@ -464,9 +464,9 @@ class TransactionItem extends StatefulWidget {
 
 TransactionItem 생성자에 key로 UniqueKey()를 전달할 경우, setState()가 호출될 때마다 rebuild 되어 background 색깔이 계속 랜덤으로 바뀌는 문제가 생긴다.
 
-<image src="./images/capture3.png" width="400">
+<image src="./images/capture3.png" width="300">
 
-<image src="./images/capture4.png" width="400">
+<image src="./images/capture4.png" width="300">
 
 <br>
 
