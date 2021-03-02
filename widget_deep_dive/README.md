@@ -316,3 +316,191 @@ flutter: AppLifecycleState.inactive
 flutter: AppLifecycleState.paused
 Lost connection to device.
 ```
+
+<br><br>
+
+
+## 8. Understanding Context
+in build() method, you always get this build context argument, now what's this build context about? 
+we also use it for example in conjunction with mediaQuery or with theming with this of context method.
+What's the idea behind context? In Flutter, every widget has its own context.
+so every widget has its own context attached to it and that's the context to get in the build method.
+
+That's why if you have certain builder methods, like for showModalBottomSheet(), the function you pass there, like this, actually receives a context. this function receives a context automatically passed in by Flutter becuase builder functions like this also return a new Widget in the end and that widget has its own context.
+
+```
+  void _startAddNewTransaction(BuildContext ctx){
+    showModalBottomSheet(context: ctx, builder: (context){
+      return NewTransaction(_addNewTransaction);
+    });
+  }
+```
+
+So context is everywhere and every widget has its own context attached. in the end the context is the element of a widget in the element tree you could say. it's some meta information about the widget and its location in the widget tree.
+Context is used internally by Flutter to understand where this widget belongs and all the contexts of all the widgets.
+Therefore these context you could say know about each other, they know how widgets are related, how they belong together. The contexts build a skeleton of your widget tree, that's how you could think about that.
+
+So that context gives you a direct communication channels across your entire widget tree because all contexts in the end know about each other, they know where in the widget tree they are and which other widgets exsist around them.
+
+That's why for example for accessing the theme or for navigation or for mediaQuery you use the context because Flutter has a very efficient communication channel behind the scenes for passing data between widgets. we always pass data between widgets by using their constructor. This is the default way of passing data
+
+<image src="./images/understanding_context.png" width="600">
+
+<br>
+
+but If you have a large widget tree, then passing data between these widgets can get cumbersome, we'll learn about a feature called InheritedWidget that helps us with making that simpler.
+
+we have a relatively large widget tree with our app widget. SingleProduct and ProductDetail widget is sibling widget of Products widget. 
+if we need some information that's managed in the state of my app in our product detail widget, we have to pass that data down through all the widgets all the way down to the product detail widget. that's why we're currently doing in the app.
+
+<image src="./images/inherited_widget1.png" width="600">
+
+Flutter gives us a special widget, the InheritedWidget. we never used that but mediaQuery and theme uses that behind the scenes and you get a direct tunnel to the InheritedWidget and to data manged in there with the help of context becuase the context know about the general structure of your widget tree and therefore, they can directly access any other widget without passing data through arguments.
+
+<image src="./images/inherited_widget2.png" width="600">
+
+예를 들어 themeData 같은 경우 생성자를 통해 데이터를 전달하지 않고도, 위젯에서 Theme.of(context).textTheme.headline6와 같이 접근할 수 있음. 
+
+```
+[main.dart]
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Personal Expenses',
+        theme: ThemeData(
+          primarySwatch: Colors.lightGreen,
+          accentColor: Colors.amber,
+          errorColor: Colors.red,
+          fontFamily: 'Quicksand',
+          textTheme: ThemeData.light().textTheme.copyWith(
+            headline6: TextStyle(
+              fontFamily: 'Open Sans',
+              fontSize: 18,
+              fontWeight: FontWeight.bold
+            ),
+            button: TextStyle(color: Colors.white),
+          ),
+          appBarTheme: AppBarTheme(
+            textTheme: ThemeData.light().textTheme.copyWith(
+              headline6: TextStyle(
+                fontFamily: 'Open Sans', 
+                fontSize: 20,
+                fontWeight: FontWeight.bold
+              ), 
+            ),
+          ),
+        ),
+        home: MyHomePage(),
+      );
+  }
+}
+```
+
+we'll actually also take advantage of this idea of passing data behind the scene. 
+
+<br><br>
+
+
+## 9. A problem with List & Stateful Widget
+in transaction_item.dart file we have this strange 'key' thing and this strange syntax after our constuctor.
+Every widget can have a key. 
+all the widget we created manually don't accept a key argument in their constuctor, and reason for this is that most of your widget don't need a key, especially stateless widgets, so you don't have to accept this argument.
+
+let's our transaction_item would not be a StatelessWidget but a StatefulWidget. so I'll convert it to a StatefulWidget.
+and I'll use initState() to set some dynamic data for this widget which is created.
+
+
+```
+[transaction_item.dart]
+
+  @override
+  void initState() {
+    const availableColors  = [Colors.red, Colors.black, Colors.blue, Colors.purple];
+    _bgColor = availableColors[Random().nextInt(4).toInt()];
+    super.initState();
+  }
+```
+
+<image src="./images/capture1.png" width="400">
+
+test5 아이템을 지우면 test6 아이템이 파란색으로 변경되는 것을 볼 수 있다. 이는 widget이 지워져도 state는 남아있어 발생하는 문제이다.
+
+<image src="./images/capture2.png" width="400">
+
+<br><br>
+
+## 10. Using keys
+keys are really useful in situations like this. on that Card widget, we could set a key if that would be our root level widget in our ListView. Flutter has a couple of built-in keys and attached. UniqueKey() class is built into Flutter and it 
+automatically creates a unique key for every item, so every new item gets its own unique key attached. 
+but UniqueKey is not really great. if this rebuilds constantly  
+
+```
+[transaction_list.dart]
+  @override
+  Widget build(BuildContext context) {
+    ...
+
+      ListView(
+        children:
+          transactions.map((transaction) => TransactionItem(
+            key: UniqueKey(), 
+            transaction: transaction, 
+            deleteTransaction: deleteTransaction,)
+          ).toList()
+      );
+      ...
+  }
+
+[transaction_item.dart]
+class TransactionItem extends StatefulWidget {
+  const TransactionItem({
+    Key key,
+    @required this.transaction,
+    @required this.deleteTransaction,
+  }) : super(key: key);
+}
+```
+
+TransactionItem 생성자에 key로 UniqueKey()를 전달할 경우, setState()가 호출될 때마다 rebuild 되어 background 색깔이 계속 랜덤으로 바뀌는 문제가 생긴다.
+
+<image src="./images/capture3.png" width="400">
+
+<image src="./images/capture4.png" width="400">
+
+<br>
+
+even if nothing inside of the list(transaction_item.dart) changes but the parent widget(transaction_list.dart) changed, 
+you get a new unique key assigned and therefore, Flutter is not able to match up the items and it loses your data. 
+so instead, you should use a **ValueKey**, that is a key where you pass your own indenfier and that of course should be a value that is unique to every list item you have.
+
+(with new keys generated constantly, Flutter finds no widgets for the elements that now look for widget type + key. Hence new state object are created all the time) the Transaction.Id is perfect for key.
+Unlike UniqueKey(), ValueKey() does not calculate a random value but simply wraps a non-changing identifier provided by you.
+
+```
+
+[transaction_list.dart]
+  @override
+  Widget build(BuildContext context) {
+    ...
+
+      ListView(
+        children:
+          transactions.map((transaction) => TransactionItem(
+            key: ValueKey(transaction.id), 
+            transaction: transaction, 
+            deleteTransaction: deleteTransaction,)
+          ).toList()
+      );
+      ...
+  }
+
+```
+
+ now if the first widget gets removed and of course keep in mind that our state is also attached to our elements.
+ If the first widget gets removed, now Flutter when it checks the element tree finds out that this element has no matching widget anymore because it does find another widget which is of type item but not with a key of 1, this has a key of 2.
+ Therefore Flutter goes ahead and destorys this element and does not try to reattach the state to this widget.
+
+ Keys simply make it easier for Flutter to identify the connected widget.
+ keys help Flutter link elements(element tree) and widgets(widget tree) correctly.
+ You sould really only use keys when you need them though, don't start using them everywhere on every widget becuase Flutter by default doesn't need them.
