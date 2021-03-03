@@ -266,6 +266,47 @@ for an elliptical clip.
 <br><br>
 
 ## 8. Finishing the Meal List Item
-Please note on every inage that we have rounded corners at the top but not at the bottom
+Please note on every inage that we have rounded corners at the top but not at the bottom. at the bottom we have normal corners. 
 
+### 1) positioned
+when you're in a stack, you can use a special widget which really only works inside of a stack.
+You can wrap text with widget **positioned**. Positioned allows us to position the child widget in an absoulte coordinate space. we can add of properties(bottom, left, right, top). so we can tell how far away we want to be from the bottom, from the left, from the right and from the top in our stack and the stack container itself is defined by its biggest child which clearly is our image.
 
+we want to have 20 pixels distance from the bottom and 0 pixels or 10 pixels distance from the right to position it in the bottom right corner.
+
+```
+Positioned(
+  bottom: 20,
+  right: 10,
+  child: Text(
+    title, 
+    style: TextStyle(fontSize: 26, color: Colors.white), 
+    softWrap: true,
+    overflow: TextOverflow.fade,
+  ),
+)
+```
+
+이렇게 설정할 경우 아래 이미지처럼 텍스트가 길어질 경우 잘리게 됨
+
+<image src="./images/overflow.png" width="400">
+
+Text 위젯을 Container 위젯으로 wrapping 하고 width를 지정한다.
+
+```
+Positioned(
+  bottom: 20,
+  right: 10,
+  child: Container(
+    width: 250,
+    color: Colors.black54,
+    padding: EdgeInsets.symmetric(vertical:5, horizontal: 20),
+    child: Text(
+      title, 
+      style: TextStyle(fontSize: 26, color: Colors.white), 
+      softWrap: true,
+      overflow: TextOverflow.fade,
+    ),
+  ),
+)
+```
