@@ -289,7 +289,7 @@ Positioned(
 
 이렇게 설정할 경우 아래 이미지처럼 텍스트가 길어질 경우 잘리게 됨
 
-<image src="./images/overflow.png" width="400">
+<image src="./images/overflow.png" width="300">
 
 Text 위젯을 Container 위젯으로 wrapping 하고 width를 지정한다.
 
@@ -310,3 +310,24 @@ Positioned(
   ),
 )
 ```
+
+<br><br>
+
+## 9. Scaffold
+evey widget which you use as a standalone page, which occupies the entire content of the page, so which you don't include just into other widgets, every standalone widget which you load through routing, which you navigate to with the navigator needs a scaffold widget bacause that adds the background, the appBar and also in general, connects the widget to our material app and to the theme set up there to the fonts.
+
+<br><br>
+
+## 10. onGenerateRoute & onUnknownRoute
+when you use pushNamed() you need to register to page, the route for that page in the main.dart file, when you use push(), you create the route with the MaterialPageRoute class. for pushNamed() you have to set up this routes table in the main.dart file. 굳이 설정 안해도 됨. 
+
+### 1) onGenerateRoute
+this takes a function which gives you some route settings, so some information about the route, like the argument. and That should also return a route. So you should return a MaterialPageRoute.
+If you are going to a named route, with pushNamed, that is not registered in the routes table and then reach the onGanerateRoute screen.
+any route that's not registered in the routes screen, as long as we try to reacth it through a named route. 
+
+### 2) onUnknownRoute
+onUnknownRoute is reached when Flutter failed to build a screen with all other mesures.
+if you don't use onGenerateRoute, then in the end as a last result before it throws an error, Flutter will try to use onUnknownRoute to shouw something on the screen. (404 error page)
+
+<br><br>
