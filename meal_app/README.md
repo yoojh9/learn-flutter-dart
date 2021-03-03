@@ -331,3 +331,100 @@ onUnknownRoute is reached when Flutter failed to build a screen with all other m
 if you don't use onGenerateRoute, then in the end as a last result before it throws an error, Flutter will try to use onUnknownRoute to shouw something on the screen. (404 error page)
 
 <br><br>
+
+## 11. Adding a TabBar
+I want tabs at the bottom of this categoryScreen and also at the bottom of this to be added favoriteScreen.
+we will add a totally new screen and I'll name that tabs_screen.dart.
+TabScreen will only manage the tabs and then load different screens depending on which tab was selected. 
+So the TabScreen itself is a widget, though it will be a stateful widget.
+
+TabScreen has the goal of rendering the tabs and then the appropriate content for each tab depending on which tab was selected. TabScreen will fill out the overall page in the build() method, Hence we should return a scaffold widget because you learned if you want to manage the entire screen with a widget, you typically use a scaffold since this sets the background color, lets you add an appBar and lets you add tabs.
+
+<br>
+
+### actually, these are two ways of adding tabs to Flutter apps.
+
+#### (1) Adding a TabBar to the AppBar
+The first way is that you add the tabs not at the bottom of the screen but at the bottom of your appBar
+For that pattern, you actually don't return a scaffold here but a DefaultTabController widget which then has a Scaffold widget as its child.
+
+```
+[tabs_screen.dart]
+
+class TabScreen extends StatefulWidget {
+  @override
+  _TabScreenState createState() => _TabScreenState();
+}
+
+class _TabScreenState extends State<TabScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      initialIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Meals'),
+          bottom: TabBar(
+            tabs: [
+              Tab(
+                icon: Icon(Icons.category),
+                text: 'Category'
+              ),
+              Tab(
+                icon: Icon(Icons.star),
+                text: 'Favorite'
+              )
+            ],
+          )
+        ),
+        body: TabBarView(
+          children: [
+            CategoriesScreen(),
+            FavoriteScreen()
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+Remember that for FavoriteScreen, as you see, we not add a scaffold here, The reason for that is that the FavoriteScreen still is like a screen, it still occupies the majority of our page but it doesn't manage the entire page. 
+Of course, we still have our tabs in the appBar of the TabScreen up there, So the content we load into a tab should  not bring its own scaffold because it will not control the entire page. instead it will be a part of the TabScreen, the FavoriteScreen is now only controlling that bottom part
+
+```
+[favorite_screen.dart]
+class FavoriteScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('Favorite'),);
+  }
+}
+```
+
+<image src="./images/tab_view.png" width="300">
+
+So for the CategoryScreen, you should now alsh get rid of the scaffold and just return what you want to show in the content,
+
+```
+[category_screen.dart]
+class CategoriesScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GridView(
+        padding: const EdgeInsets.all(25),
+        children: DUMMY_CATEGORIES.map((category) => CategoryItem(category.id, category.title, category.color)).toList(),
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          childAspectRatio: 3 / 2,
+          mainAxisSpacing: 20,
+          crossAxisSpacing: 20
+          )
+    );
+  }
+}
+```
+
+
+#### (2) Adding a Bottom TabBar
