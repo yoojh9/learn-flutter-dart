@@ -823,9 +823,13 @@ _filters에서 전달받은 값을 initState()에서 초기화 하는 작업이 
 
 ```
 [main.dart]
- FiltersScreen.routeName : (ctx) => FiltersScreen(_setFilters, _filters),
 
+ FiltersScreen.routeName : (ctx) => FiltersScreen(_setFilters, _filters),
+```
+
+```
 [filters_screen.dart]
+
 class FiltersScreen extends StatefulWidget {
   static const routeName = '/filters';
 
