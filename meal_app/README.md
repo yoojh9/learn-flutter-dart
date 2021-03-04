@@ -719,3 +719,139 @@ class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
     });
   }
 ```
+
+<br><br>
+
+
+## 15. Adding Filter Switches
+we can set some filters on the FilterScreen which actually impact the meals. for example, when I set my filter to vegetarian, I don't see the hamburger.
+First step, we can convert the FilterScreen to a StatefulWidget becuase we'll have to manage which filters the user set or not. 
+
+<br><br>
+
+## 16. Adding Filtering Logic
+There are different ways of approaching that, what we'll always have to do though is we'll have to manage our set filter in main.dart.
+becuase that is the only place where we can in the end reach both the FilterScreen and also reach the CategoryMealsScreen which is where we need to pass our set filters.
+So I want to manage my filters globally in here and in the state management module.
+
+Filter를 적용한 기준으로 데이터를 변경하고 싶다면,
+
+- main.dart 파일의 MyApp 클래스를 StatelessWidget에서 StatefulWidget으로 변경한다.
+
+```
+[main.dart]
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      ...
+    )
+  }
+}
+```
+
+- Filter에서 적용한 값을 반영하기 위해, main.dart에 filterHandler를 추가한다.
+
+- List<Meal>은 main.dart에서 global로 관리한다.
+
+
+```
+class _MyAppState extends State<MyApp> {
+  Map<String, bool> _filters = {
+    'gluten': false,
+    'lactose': false,
+    'vegan': false,
+    'vegetarian': false
+  };
+
+  List<Meal> _availableMeals = DUMMY_MEALS;
+
+  void _setFilters(Map<String, bool> filterData){
+    setState(() {
+      _filters = filterData;
+      _availableMeals = DUMMY_MEALS.where((meal) => meal.isGlutenFree == _filters['gluten'] 
+          && meal.isLactoseFree == _filters['lactose'] 
+          && meal.isVegan == _filters['vegan']
+          && meal.isVegetarian == _filters['vegetarian']).toList();
+    });
+  }
+```
+
+- routes에 handler와 global data를 전달한다.
+
+```
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        accentColor: Colors.amber,
+        canvasColor: Color.fromRGBO(255, 254, 229, 1),
+        fontFamily: 'Raleway',
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: ThemeData.light().textTheme.copyWith(
+          bodyText1: TextStyle(color: Color.fromRGBO(20, 51, 51, 1)),
+          bodyText2: TextStyle(color: Color.fromRGBO(20, 51, 51, 1)),
+          headline6: TextStyle(fontSize: 18, fontFamily: 'RotoboCondensed', fontWeight: FontWeight.bold),
+        )
+      ),
+      // home: CategoriesScreen(),
+      routes: {
+        '/': (ctx) => TabScreen(),
+        CategoryMealsScreen.routeName : (ctx) => CategoryMealsScreen(_availableMeals),
+        MealDetailScreen.routeName : (ctx) => MealDetailScreen(),
+        FiltersScreen.routeName : (ctx) => FiltersScreen(_setFilters),
+      },
+      // onGenerateRoute: (settings){
+      //   print(settings.arguments);
+      //   return MaterialPageRoute(builder: (ctx) => CategoriesScreen()); 
+      // },
+    );
+  }
+
+```
+
+그러나 현재 코드로는 FilterScreen에서 저장한 filter들이 초기화 되어 저장되지 않는다. main.dart의 _filters값을 넘겨주는 작업이 필요하다.
+_filters에서 전달받은 값을 initState()에서 초기화 하는 작업이 요구된다.
+
+```
+[main.dart]
+ FiltersScreen.routeName : (ctx) => FiltersScreen(_setFilters, _filters),
+
+[filters_screen.dart]
+class FiltersScreen extends StatefulWidget {
+  static const routeName = '/filters';
+
+  final Function saveFilters;
+  final Map<String, bool> filters;
+
+  FiltersScreen(this.saveFilters, this.filters);
+
+  @override
+  _FiltersScreenState createState() => _FiltersScreenState();
+}
+
+class _FiltersScreenState extends State<FiltersScreen> {
+  bool _glutenFree = false;
+  bool _vegetarian = false;
+  bool _vegan = false;
+  bool _lactoseFree = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _glutenFree = widget.filters['gluten'];
+    _vegetarian = widget.filters['vegetarian'];
+    _vegan = widget.filters['vegan'];
+    _lactoseFree = widget.filters['lactose'];
+  }
+
+
+```
