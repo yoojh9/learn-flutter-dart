@@ -405,7 +405,7 @@ class FavoriteScreen extends StatelessWidget {
 
 <image src="./images/tab_view.png" width="300">
 
-So for the CategoryScreen, you should now alsh get rid of the scaffold and just return what you want to show in the content,
+So for the CategoryScreen, you should now get rid of the scaffold and just return what you want to show in the content,
 
 ```
 [category_screen.dart]
@@ -426,5 +426,125 @@ class CategoriesScreen extends StatelessWidget {
 }
 ```
 
+<br>
 
 #### (2) Adding a Bottom TabBar
+for this approach of adding tabs, we wouldn't have needed a stateful widget though, a stateless widget would have done the trick because we're not managing any state. 
+That will change when we add tabs at the bottom becuase that simply works a bit different. the Flutter Team wants it to work like this. 
+There you won't use the DefaultTabController, instead we'll remove the defauDefaultTabController and therefore return the Scaffold in the TabScreen,
+and now on that scaffold if you want to have tabs at the bottom, you don't add them on the appBar, 
+
+so you get rid of that bottom argument on the appBar where you added the TabBar, that's removed. and you also don't have a TabBar view as your body.
+instead you will add a bottomNavigationBar.
+
+and that is the biggest difference compared to the tabs we added at the top below our appBar, For the bototmNavigationBar you manually have to control what the user selected and which content you want to display. So for that on the bottomNavigationBar itself, you register an onTap listener and that is triggered whenever an item is selected.
+
+```
+[tabs_screen.dart]
+
+class TabScreen extends StatefulWidget {
+  @override
+  _TabScreenState createState() => _TabScreenState();
+}
+
+class _TabScreenState extends State<TabScreen> {
+  final List<Widget> _pages = [
+    CategoriesScreen(),
+    FavoriteScreen(),
+  ];
+
+  int _selectedPageIndex = 0;
+  
+  void _selectPage(int index){
+    setState(() {
+      _selectedPageIndex = index;
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Meals'),
+      ),
+      body: _pages[_selectedPageIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: (index){
+          _selectPage(index);
+        }, // automatically receive index.
+        backgroundColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.white,
+        selectedItemColor: Theme.of(context).accentColor,
+        currentIndex: _selectedPageIndex,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Categories'),
+          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Favorites')
+        ],
+        elevation: 5,
+      )
+    );
+  }
+}
+
+```
+
+<image src="./images/bottom_tabbar.png" width="300">
+
+<br><br>
+
+
+## 12. Adding a Custom Drawer
+You can add a drawer by simply to your scaffold, not to the appBar but to the scaffold. and there you can add a drawer argument.
+The drawer argument typically takes a drawer widget which is a widget built into Flutter, which automatically gives you a drawer.
+on that drawer, you can add any content you want, any widgets you want.
+
+```
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_pages[_selectedPageIndex]['title']),
+      ),
+      drawer: Drawer(child: Text('The Drawer!'),),
+      body:...
+    )
+```
+
+this line of drawer code gives us this hamburger icon, automatically managed by Flutter. if tap it, this drawer slides open.
+
+<image src="./images/drawer_1.png" width="300">
+
+You would not just add a boring text here but a more meaningful content. Now the content I do want to add here are essentially two buttons, two links.
+
+I want to add a background color to the overall container where I use my accent color. we can do this with the 'color' argument on the Container.
+By the way, an alternative always is decoration with BoxDecoration where you then set the color, this does the same as the color argument. 
+
+However If you do use decoration, you have to set the color through the decoration and not through the color key, otherwise you would get an error by Flutter.
+
+```
+class MainDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          Container(
+            height: 120, 
+            width: double.infinity,
+            padding: EdgeInsets.all(20),
+            alignment: Alignment.centerLeft,
+            color: Theme.of(context).accentColor,
+            // decoration: BoxDecoration(
+            //   color: 
+            // ),
+            child: Text('Cooking Up!', style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 30,
+              color: Theme.of(context).primaryColor),
+            ), 
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
