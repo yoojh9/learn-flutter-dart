@@ -522,6 +522,15 @@ However If you do use decoration, you have to set the color through the decorati
 
 ```
 class MainDrawer extends StatelessWidget {
+  Widget _buildListTile(String title, IconData icon){
+    return ListTile(
+      leading: Icon(icon, size: 26),
+      title: Text(title, style: TextStyle(fontFamily: 'RobotoCondensed', fontSize: 24, fontWeight: FontWeight.bold),),
+      onTap: () {
+        // ... ToDo
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -533,18 +542,180 @@ class MainDrawer extends StatelessWidget {
             padding: EdgeInsets.all(20),
             alignment: Alignment.centerLeft,
             color: Theme.of(context).accentColor,
-            // decoration: BoxDecoration(
-            //   color: 
-            // ),
             child: Text('Cooking Up!', style: TextStyle(
               fontWeight: FontWeight.w900,
               fontSize: 30,
               color: Theme.of(context).primaryColor),
             ), 
           ),
+          SizedBox(height: 20,),
+          _buildListTile('Meals', Icons.restaurant),
+          _buildListTile('Filters', Icons.settings),
         ],
       ),
     );
   }
 }
+```
+
+<image src="./images/drawer_2.png" width="300">
+
+<br><br>
+
+
+## 13. Replacing Pages (Instead of Pushing)
+Drawer 메뉴 중 FilterScreen으로 이동하고 FilterScreen에서 back button을 통해 뒤로 가면,
+<image src="./images/replacing_pages1" width="300">
+
+아래와 같은 화면을 볼 수 있다.
+
+<image src="./images/replacing_pages2" width="300">
+
+The solution is relatively simple, all we have to do is in the FilterScreen, we have to add the drawer again and reference our main drawer.
+
+```
+class FiltersScreen extends StatelessWidget {
+  static const routeName = '/filters';
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Your Filters')),
+      drawer: MainDrawer(),
+      body: Text('Filters'),
+    );
+  }
+}
+```
+
+### 1) pushReplacementNamed() / pushReplacement()
+But there's one behavior which I'm not liking, I'm always pushing my page which I'm loading on top of that stack of pages. 
+위에 방식처럼 계속 Drawer로 접근하다 보면, the problem is that we get a stack of pages that's bigger and bigger over time because we never clear the existing pages.
+
+I want to clear my stack and simply push the new page as the only stack page onto my stack.
+so if I go to meals, the filters page should be deleted, if I go to filters, the meals page, the tabs page should be deleted automatically.
+Now It's easy to do that in FLutter, inside of the drawer, instead of using pushNamed()
+
+You can use pushReplacementNamed() or if you have no named route but you create it in place, you also have pushReplacement and then you would pass a MaterialPageRoute.
+
+You will replace the existing page on the stack with the new page. so you don't add the new page on top of it in that stack of pages but you replace the existing page and hence you would also not get a back button. 
+
+Now we avoid that our stack gets bigger and bigger. 
+
+If I do full restart the app and I then go to filter screen, you see now we have no back button. and the reason for that is that Flutter recognizes that noting is on the stack, that are no page to go back to because we didn't keep the old page and push the new one on top of it,
+instead we replaced the old page, we deleted it and then added the new page and hence we can't go back.
+
+To replace the existing page, for example also when you add user authentication, when you entered your login data and you hit login and you then reach your main app, typically you don't want to provide a back button to go back to the login becuase you already are logged in.
+
+with the drawer, it's just another example to avoid an infinitely growing stack of pages behind the scenes which could lead to memory problems at some point of time.
+
+<br><br>
+
+
+## 14. Popping pages & Passing Data Back
+sometimes you need to pass some data back to the previous page.
+Pop removes screens that are on top of the stack.
+Pop can be very useful if you have somthing in your code that requires you to go back or to remove a dialog or some other overlay from the screen in code.
+You also have popAndPushNamed(), it pops the current page off and thereafter, it pushes a new named page.
+canPop() check where you actually can go back before you do call pop might be a good idea if you're not sure whether you have another page in your app.
+
+we can also pass some data to pop. you can pass any data you want, a map, a list, a String, a number, an object whatever you want.
+
+```
+[meal_detail_screen.dart]
+floatingActionButton: FloatingActionButton(
+  child: Icon(Icons.delete), 
+  onPressed: (){
+    Navigator.of(context).pop(mealId);
+  },
+),
+
+[meal_item.dart]
+void selectMeal(BuildContext context) {
+  Navigator.of(context)
+    .pushNamed(MealDetailScreen.routeName, arguments: id)
+    .then((result) => print(result));
+}
+```
+
+<br>
+
+pop()에서 전달한 mealId를 기준으로 categoryMealScreen에서 해당 meal을 삭제하려고 한다.
+- StatelessWidget -> StatefulWidget으로 변경한다.
+- state가 변경되면 build()가 계속 호출되므로, 기존 build() 메소드에 있던 데이터 세팅 작업은 initState()로 옮긴다.
+
+```
+// 아래 작업은 initState()에서 진행되도록 한다.
+  @override
+  Widget build(BuildContext context) {
+    final routeArgs = ModalRoute.of(context).settings.arguments as Map<String, String>;
+    final categoryTitle = routeArgs['title'];
+    final categoryId = routeArgs['id'];
+    final categoryMeals = DUMMY_MEALS.where((meal) => meal.categoryIds.contains(categoryId)).toList();
+  }
+
+  @override
+  void initState() {
+    final routeArgs = ModalRoute.of(context).settings.arguments as Map<String, String>;
+    categoryTitle = routeArgs['title'];
+    final categoryId = routeArgs['id'];
+    displayedMeals = DUMMY_MEALS.where((meal) => meal.categoryIds.contains(categoryId)).toList();
+   
+    super.initState();
+  }
+
+```
+
+Now we'll load data when this component or when this widget is created and we can therfore also manipulate our data and update the user interface becuase we're in s StatefulWidget
+
+initState()를 변경하고 실행시키면 에러가 발생하는데,
+The problem is that this call which modalRoute.of(context).
+this does not work becuase context generally is thankfully a property that's globally available in our state object but not inside of initState because initState runs too early, it runs before our widget has been created or fully created and before we have a context for our widget.
+So what's the solution for that? There is another lifecycle hook which I haven't mentioned before and that's **didChangeDependencies()**
+
+<br>
+
+### 1) didChangeDependencies()
+it's really useful because this will be triggered essentially whenever the references of the state change, which also means it will be called when the widget that belongs to the state has been fully initialized. and we can tap into context. this will still run before build runs.
+
+so I can put my code which I had in initState(), initState() would have been great if we wouldn't have required to use modalRoute.of(context).
+so any .of(context) stuff which you need to do will unfortunately not work but in didChangeDependencies.
+
+if I delete this, still there. Reason for that is that didChangeDependencies() runs couple of times after the initialization of that state, 
+that's the difference to initState. It runs whenever the dependencies of this stat change and that's also the case when the attached widget changes,
+which unfortunately is the case when we call setState().  
+
+So the state we set where we do delete a meal is basically overwritten when didChangeDependencies() runs again and we basically load all meeals again.
+
+
+```
+[category_meals_screen.dart]
+
+class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
+  String categoryTitle;
+  List<Meal> displayedMeals;
+  bool _loadedInitData = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    if(_loadedInitData == false){
+      final routeArgs = ModalRoute.of(context).settings.arguments as Map<String, String>;
+      categoryTitle = routeArgs['title'];
+      final categoryId = routeArgs['id'];
+      displayedMeals = DUMMY_MEALS.where((meal) => meal.categoryIds.contains(categoryId)).toList();
+      _loadedInitData = true;
+    } 
+    super.didChangeDependencies();
+  }
+  
+  void _removeMeal(String mealId) {
+    print('_removeMeal($mealId)');
+    setState(() {
+      displayedMeals.removeWhere((meal) => meal.id == mealId);
+    });
+  }
 ```
