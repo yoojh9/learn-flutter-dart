@@ -937,3 +937,8 @@ FavoriteScreen에서 음식을 선택하고 MealDetailScreen으로 들어가 fav
 <image src="./images/problem2.png" width="300">
 
 we're managing global data in our main.dart file, when we use the main.dart file for managing that, we run into problems like this and we also have the problem of always rebuilding the entire app with every change. These are all problems that will be solved with a better state management tool, which is why we'll have a look at such a tool in the next course.
+
+<br><br>
+
+## Summary
+<image src="./images/summary.png" width="500">
