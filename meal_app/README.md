@@ -941,4 +941,4 @@ we're managing global data in our main.dart file, when we use the main.dart file
 <br><br>
 
 ## Summary
-<image src="./images/summary.png" width="500">
+<image src="./images/summary.png" width="700">
