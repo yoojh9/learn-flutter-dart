@@ -8,5 +8,5 @@
 - [4. Responsive & Adaptive UI](./responsive_adaptive_ui)
 - [5. Widget & Flutter Internal - Deep Device](./widget_deep_dive)
 - [6. Navigation & Multiple Screens - Meals App](./meal_app)
-
+- [7. Advanced App & State Management - Shop App](./shop_app)
 
