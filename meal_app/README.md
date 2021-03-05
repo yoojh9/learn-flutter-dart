@@ -927,7 +927,7 @@ class _TabScreenState extends State<TabScreen> {
 
 <br><br>
 
-## 18. A Ploblem
+## 18. A Problem
 
 FavoriteScreen에서 음식을 선택하고 MealDetailScreen으로 들어가 favorite 버튼을 해제하고, 다시 뒤로 간 뒤 FavoriteScreen을 보면 favorite을 취소한 음식이 사라지지 않은 것을 볼 수 있다.
 하지만 다시 drawer 메뉴에서 FavoriteScreen으로 들어오면 해당 음식이 사라진 것을 볼 수 있다.
