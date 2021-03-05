@@ -859,3 +859,81 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
 
 ```
+
+<br><br>
+
+## 17. Adding a "Marking as Favorite" Feature
+favorite meal 역시 global로 관리해야 하므로 main.dart에 변수를 추가하고, main -> TabScreen -> FavoriteScreen으로 변수를 전달한다.
+
+```
+[main.dart]
+
+List<Meal> _favoriteMeals = [];
+
+routes: {
+  '/': (ctx) => TabScreen(_favoriteMeals),
+  CategoryMealsScreen.routeName : (ctx) => CategoryMealsScreen(_availableMeals),
+  MealDetailScreen.routeName : (ctx) => MealDetailScreen(),
+  FiltersScreen.routeName : (ctx) => FiltersScreen(_setFilters, _filters),
+},
+```
+
+widget 변수를 필요로 하는 initialize 작업을 StatefulWidget 클래스 내에서 바로 작업을 하면, widget 변수에 접근할 수 없어 에러가 발생한다.
+
+```
+[tabs_screen.dart]
+
+class TabScreen extends StatefulWidget {
+  final List<Meal> favoriteMeals;
+
+  TabScreen(this.favoriteMeals);
+
+  @override
+  _TabScreenState createState() => _TabScreenState();
+}
+
+class _TabScreenState extends State<TabScreen> {
+
+  final List<Map<String, Object>> _pages = [
+    {'page': CategoriesScreen(), 'title': 'Categories'},
+    {'page': FavoriteScreen(widget.favoriteMeals), 'title': 'Favorites'}
+  ];
+}
+```
+
+<br>
+
+widget 변수는 initState()에서 접근할 수 있으므로 initState()에서 _pages 초기화를 진행한다.
+in initState(), widget is available, It will still run before build executes.
+So we will have everything set up when build runs but we avoid that issue of widget, of that property not being available at the point of time we're initializing this class.
+
+```
+class _TabScreenState extends State<TabScreen> {
+
+  List<Map<String, Object>> _pages;
+
+  int _selectedPageIndex = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      {'page': CategoriesScreen(), 'title': 'Categories'},
+      {'page': FavoriteScreen(widget.favoriteMeals), 'title': 'Favorites'}
+    ];
+  }
+
+```
+
+<br><br>
+
+## 18. A Ploblem
+
+FavoriteScreen에서 음식을 선택하고 MealDetailScreen으로 들어가 favorite 버튼을 해제하고, 다시 뒤로 간 뒤 FavoriteScreen을 보면 favorite을 취소한 음식이 사라지지 않은 것을 볼 수 있다.
+하지만 다시 drawer 메뉴에서 FavoriteScreen으로 들어오면 해당 음식이 사라진 것을 볼 수 있다.
+
+<image src="./images/problem1.png" width="300">
+
+<image src="./images/problem2.png" width="300">
+
+we're managing global data in our main.dart file, when we use the main.dart file for managing that, we run into problems like this and we also have the problem of always rebuilding the entire app with every change. These are all problems that will be solved with a better state management tool, which is why we'll have a look at such a tool in the next course.
