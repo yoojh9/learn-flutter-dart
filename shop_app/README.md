@@ -358,7 +358,7 @@ class ProductsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = context.watch<Products>().items;
+    final products = Provider.of<Products>(context).items;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
@@ -556,11 +556,277 @@ void main() {
 }
 
 [products_grid.dart]
-ChangeNotifierProvider.value(
-    value: products[index],
-    child: ProductItem()
-),
+class ProductsGrid extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    final products = Provider.of<Products>(context).items;
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(10.0),
+      itemCount: products.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, 
+        childAspectRatio: 3/2, 
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ), 
+      itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+        value: products[index],
+        child: ProductItem()
+      ),
+    );
+  }
+}
 ```
 
 <br><br>
 
+## 12. Using "Consumer" instead of "Provider.of"
+There is another alernative syntax which I want to show you that's related to how you listen to changes. 
+There is another way which is totally equal which you could also use. 
+You could wrap the Consumer widget, to be available you need to import your provider package.
+Consumer actually does not take just a child but actually a builder.
+
+```
+[product_item.dart]
+
+ class ProductItem extends StatelessWidget {
+
+   @override
+   Widget build(BuildContext context) {
+     return Consumer<Product>(
+        builder: (ctx, product, child) => ClipRRect(
+         borderRadius: BorderRadius.circular(10),
+         child: GridTile(
+           child: GestureDetector(
+             onTap: (){
+               Navigator.of(context).pushNamed(ProductDetailScreen.routeName, arguments: product.id);
+             },
+             child: Image.network(product.imageUrl, fit: BoxFit.cover,)
+           ),
+           footer: GridTileBar(
+            backgroundColor: Colors.black38,
+             leading: IconButton(
+               icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border), 
+               color: Theme.of(context).accentColor,
+               onPressed: product.toggleFavoriteStatus,
+             ),
+             title: Text(product.title, textAlign: TextAlign.center,),
+             trailing: IconButton(
+               icon: Icon(Icons.shopping_cart), 
+               color: Theme.of(context).accentColor,
+               onPressed: (){},
+              ),
+            ),
+         ),
+       ),
+     );
+   }
+ }
+```
+
+when you use provider.of then the whole build method will rerun whenever that data changes. with clever widget splitting, you can split your widgets such that this isn't a problem because you want to run the entire build method when something changes.
+but you could always have a case where you only want to run a subpart of your widgets tree when some data changes and then you could only wrap the subpart of the widget tree that depends on your product data with that listener. 
+
+<br>
+
+### 1) 변경되는 데이터 Widget만 바뀌도록 코드 수정
+
+favorite IconButton을 Tap 하더라도 'product rebuild' print문이 찍히지 않는다.
+단, product provider의 listen을 true로 전달하면 favorite 버튼이 tap 될 때마다 rebuild 된다.
+
+```
+ class ProductItem extends StatelessWidget {
+
+   @override
+   Widget build(BuildContext context) {
+     final product = Provider.of<Product>(context, listen: false);
+     print('product rebuild');
+      
+     return ClipRRect(
+         borderRadius: BorderRadius.circular(10),
+         child: GridTile(
+           child: GestureDetector(
+             onTap: (){
+               Navigator.of(context).pushNamed(ProductDetailScreen.routeName, arguments: product.id);
+             },
+             child: Image.network(product.imageUrl, fit: BoxFit.cover,)
+           ),
+           footer: GridTileBar(
+            backgroundColor: Colors.black38,
+             leading: Consumer<Product>(
+                builder: (ctx, product, child) => IconButton(
+                  icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border), 
+                  color: Theme.of(context).accentColor,
+                  onPressed: product.toggleFavoriteStatus,
+                ),
+             ),
+             title: Text(product.title, textAlign: TextAlign.center,),
+             trailing: IconButton(
+               icon: Icon(Icons.shopping_cart), 
+               color: Theme.of(context).accentColor,
+               onPressed: (){},
+              ),
+            ),
+         ),
+       );
+   }
+ }
+```
+
+
+<br><br>
+
+## 13. Local State vs App-wide State
+Why do we not use a stateful widget? 
+we're now using the provider to manage whether our product is a favorite or not. but we only need that information to change icon.
+Now since I change that icon in my product_item widget, we could also turn this into a stateful widget. 
+and yes, this would be absolutely the right thing to do if you have some state, some data which only affects this widget. 
+
+<image src='./images/state.png' width='700'>
+
+**Widget(lcoal)State** is a state which only affects a single widget. if you only want to switch the icon on a button in a widget, then you would typically manage that state only in that widget and therefore you would always use a stateful widget. Don't use provider or a provided class if you only want to change how something is displayed inside of a widget.
+
+of course, it means that the information about whether a product is a favorite or not does not just matter to the product item but to the entire app or at least to a significant part of that app.
+
+
+```
+[products.dart]
+
+  var _showFavoritesOnly = false;
+
+  List<Product> get items {
+    if(_showFavoritesOnly){
+      return _items.where((item) => item.isFavorite).toList();
+    }
+    return [..._items];  // return copy off
+  }
+
+  Product findById(String id){
+    return _items.firstWhere((item) => item.id == id);
+  }
+
+  void addProduct(value){
+    _items.add(value);
+    notifyListeners();
+  }
+
+  void showFavoritesOnly() {
+    _showFavoritesOnly = true;
+    notifyListeners();
+  }
+
+  void showAll(){
+    _showFavoritesOnly = false;
+    notifyListeners();
+  }
+  
+
+```
+
+```
+[product_overview_screen.dart]
+
+class ProductOverviewScreen extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    final productsContainer = Provider.of<Products>(context, listen: false);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('MyShop'),
+        actions: [
+          PopupMenuButton(
+            onSelected: (FilterOptions selectedValue) {
+              if(selectedValue == FilterOptions.Favorites) {
+                productsContainer.showFavoritesOnly();
+              } else {
+                productsContainer.showAll();
+              }
+            },
+            icon: Icon(Icons.more_vert), 
+              itemBuilder: (_) => [
+              PopupMenuItem(child: Text('Only Favorites'), value: FilterOptions.Favorites,),
+              PopupMenuItem(child: Text('Show All'), value: FilterOptions.All,)
+            ]
+          )
+        ],
+      ),
+      body: ProductsGrid(),
+    );
+  }
+}
+
+```
+
+이렇게 하면 오류 없이 작동하지만, products provider를 사용하는 모든 위젯에 _showFavoritesOnly 필터가 적용된다는 것이다. _showFavoritesOnly는 products_overview_screen.dart에서만  사용된다.
+
+### 1) Turn into a StatefulWidget. (Local State)
+it's really an information that belongs to a sigle widget and not into the global app-wide state. This actually is not the approach I want to use.
+Instead, the better option would be to turn into a stateful widget
+
+we can now pass that down to the products_grid like **ProductsGrid(_showOnlyFavorites)**
+in products_grid.dart we use this with setState() so that the UI is rebuilt when you change it.
+
+```
+[products_overview_screen.dart]
+
+class ProductOverviewScreen extends StatefulWidget {
+
+  @override
+  _ProductOverviewScreenState createState() => _ProductOverviewScreenState();
+}
+
+class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
+ var _showOnlyFavorites = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final productsContainer = Provider.of<Products>(context, listen: false);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('MyShop'),
+        actions: [
+          PopupMenuButton(
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if(selectedValue == FilterOptions.Favorites) {
+                  _showOnlyFavorites = true;   
+                } else {
+                  _showOnlyFavorites = false;   
+                } 
+              });
+            },
+            icon: Icon(Icons.more_vert), 
+              itemBuilder: (_) => [
+              PopupMenuItem(child: Text('Only Favorites'), value: FilterOptions.Favorites,),
+              PopupMenuItem(child: Text('Show All'), value: FilterOptions.All,)
+            ]
+          )
+        ],
+      ),
+      body: ProductsGrid(_showOnlyFavorites),
+    );
+  }
+}
+
+```
+
+```
+[products_grid.dart]
+
+class ProductsGrid extends StatelessWidget {
+  final bool showFavorites;
+
+  ProductsGrid(this.showFavorites);
+
+  @override
+  Widget build(BuildContext context) {
+    final productsData = Provider.of<Products>(context);
+    final products = showFavorites ? productsData.favoriteItems : productsData.items;
+  }
+}
+```
