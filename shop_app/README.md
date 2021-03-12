@@ -253,3 +253,314 @@ class ProductsGrid extends StatelessWidget {
   }
 }
 ```
+
+<br><br>
+
+## 7. Inheritance("extends") vs Mixins("with")
+The idea behind a mixin is that you can share methods and properties with multiple classes but logically, you have less of a strong connection.
+mixin is like a utilicy function provider which we can use to mix certain features into this class.
+
+some programming languages support multiple parents, Dart is not one of them, you can only have one parent class.
+however, with mixins you can add as many mixins as you want. So you can add multiple mixins to the same class and all their properties and methods will be merged together in the class.
+
+So really think of mixins as utility functionality providers wheras when you use inheritance, you really have a strong logical dependency between the two classes.
+
+```
+mixin Agility {
+    var speed = 10;
+
+    void sitDown() {
+        print('Sitting down..');
+    }
+}
+
+class Malmmal {
+    void breath(){
+        print('Breath in... breath out...);
+    }
+}
+
+class Person extends Mammal with Agility {
+    String name;
+    int age;
+
+    Person(this.name, this.age);
+
+    void main(){
+        final pers = Person('Max', 30);
+        print(pers.name);
+        pers.breath();
+        print(pers.speed)
+        pers.sitDown();
+    }
+}
+```
+
+<br><br>
+
+## 8. Providing non-Objects
+Typically, when working with the Provider package, you provide objects based on your own custom classes.
+
+This makes sense because you can implement the **ChangeNotifier** mixin in your classes to to then trigger **notifyListeners()** 
+whenever you want to update all places in your app that listen to your data.
+
+<br><br>
+
+## 9. Listening in Different Places & Ways
+
+the **listen** argument which you can set to false. 
+the default is true then the build method of the widget in which you're using provider of will rerun whenever the provided object changed. 
+So if this would change or the data would change, if we call notifyListener(), then all widgets that use provider of would rebuild.
+
+with lister false, this widget will not rebuild if notifyListener is called. becuase it's not set up as an active listener and that is something you should do if you only need data one time, you want to get data from your global data storage but you're not interested in updates, then you don't need to listen.
+
+
+```
+final product = Provider.of<Products>(context, listen: false).findById(productId);
+```
+
+<br><br>
+
+## 10. Using Nested Models & Providers
+
+아래처럼 main.dart에 provider를 등록하면 global로 접근할 수 있다.
+So the entire app can listen to changes in products because we need products in different place. (products)
+
+```
+[main.dart]
+void main() {
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => Products(),)
+    ],
+    child: MyApp(),
+    ),
+  );
+}
+```
+
+Now my single product is actually really only needed in every product item list. 
+for the individual product item is that's a bit different. 
+
+in product_grid where I'm providing a product for this products item and a new product is provided for every different product item which is rendered.
+So for every grid tile because we're repeating this code for all the product so does reruns for all the products we have.
+
+There is actually one little problem you should be aware of when working with nested provider, when you're using it in a list or in a grid where flatter removes items when they leave the screen and re-adds them when they reentered the screen in such situation what actually happens is that the widget itself is reused by flutter and just the data that's attached to it changes.
+
+So flutter recycles the same widget it doesn't destroy it and recreate it which would work fine with our nested provider.
+Therfore the more items you have in your list as soon as you have items that are not visible all the time.
+
+ 
+```
+[product_grid.dart]
+
+class ProductsGrid extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    final products = context.watch<Products>().items;
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(10.0),
+      itemCount: products.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, 
+        childAspectRatio: 3/2, 
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ), 
+      itemBuilder: (ctx, index) => ChangeNotifierProvider(
+        create: (_) => products[index],
+        child: ProductItem(),
+      ) 
+    );
+  }
+}
+```
+
+I want to make sure that when we tap that favoriate button we switched a favorite status of a single product for that and our product provider follow up there in the provider's folder.
+
+```
+[product.dart]
+
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+
+class Product with ChangeNotifier{
+  final String id;
+  final String title;
+  final String description;
+  final double price;
+  final String imageUrl;
+  bool isFavorite; // will be changable
+
+  Product({
+    @required this.id,
+    @required this.title,
+    @required this.description,
+    @required this.price,
+    @required this.imageUrl,
+    this.isFavorite = false,
+  });
+
+  void toggleFavoriteStatus(){
+    isFavorite = !isFavorite;
+    notifyListeners();
+  }
+}
+```
+
+to let all listener know we need to call nofity listners like setState(), in the provider package you let listening which it's know that something changed and they should rebuild. it's the equivalent to setState().
+
+
+Favorite Icon 버튼의 onTap()에서 product.toggleFavoriteStatus를 호출한다. 메소드가 호출되면 product.isFavorite 값이 변경되고, 그에 따라 Icon이 바뀌는 것을 확인할 수 있다.
+그러나 listen:false로 provider를 등록하면 버튼이 변경되지 않는다.
+That means that when is favorite changes here it will still change behind the scene, but notifyListener will not reach this build method in this widget.
+so this product here will not received as updated is favorite status. Therefore a build will not rerun and therefore will not see the new icon.
+
+```
+[product_item.dart]
+
+ class ProductItem extends StatelessWidget {
+
+   @override
+   Widget build(BuildContext context) {
+     final product = Provider.of<Product>(context, listen: false);
+
+     return ClipRRect(
+       borderRadius: BorderRadius.circular(10),
+       child: GridTile(
+         child: GestureDetector(
+           onTap: (){
+             Navigator.of(context).pushNamed(ProductDetailScreen.routeName, arguments: product.id);
+           },
+           child: Image.network(product.imageUrl, fit: BoxFit.cover,)
+         ),
+         footer: GridTileBar(
+          backgroundColor: Colors.black38,
+           leading: IconButton(
+             icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border), 
+             color: Theme.of(context).accentColor,
+             onPressed: product.toggleFavoriteStatus,
+           ),
+           title: Text(product.title, textAlign: TextAlign.center,),
+           trailing: IconButton(
+             icon: Icon(Icons.shopping_cart), 
+             color: Theme.of(context).accentColor,
+             onPressed: (){},
+            ),
+          ),
+       ),
+     );
+   }
+ }
+```
+
+<br><br>
+
+## 11. Exploring Alternative Provider Syntaxes
+
+Provider는 ChangeNotifierProvider().create()와 ChangeNotifierProvider.value() 두가지 방식을 사용할 수 있음
+
+```
+// 1)
+ChangeNotifierProvider(
+    create: (_) => products[index],
+    child: ProductItem(
+        products[index].id, 
+        products[index].title , 
+        products[index].imageUrl
+    ),
+),
+
+// 2)
+ChangeNotifierProvider.value(
+    value: products[index],
+    child: ProductItem()
+),
+
+```
+
+### 1) Provider constructor
+
+To expose a newly created object, use the default constructor of a provider. Do not use the **.value** constructor if you want to create an object, or you may otherwise have undesired side-effects.
+
+- DO create a new object inside create.
+
+```
+Provider(
+  create: (_) => MyModel(),
+  child: ...
+)
+```
+
+- DON'T use **Provider.value** to create your object.
+
+```
+ChangeNotifierProvider.value(
+  value: MyModel(),
+  child: ...
+)
+```
+
+- DON'T create your object from variables that can change over the time. In such a situation, your object would never be updated when the value changes.
+
+```
+int count;
+
+Provider(
+  create: (_) => MyModel(count),
+  child: ...
+)
+```
+
+### 2) Reusing an existing object instance
+If your already have an object instance and want to expose it, you should use the **.value** constuctor of a provider.
+
+- DO use changeNotifierProvider.value to provide an existing ChangeNotifier
+
+```
+MyChangeNotifier variable;
+
+ChangeNotifierProvider.value(
+  value: variable,
+  child: ...
+)
+```
+
+- DON'T reuse an existing ChangeNotifier using the default constuctor
+
+```
+MyChangeNotifier variable;
+
+ChangeNotifierProvider(
+  create: (_) => variable,
+  child: ...
+)
+```
+
+### 3) In Shop-App Project
+Whenever you instantiate a class so whenever you create a new object based on a class, If you do that to provide object to the changeNotifier our provider you should use the create() method. 
+Whenever you reuse an existing object like we're doing it integrate where we cycle through a list of products which already all exist It's recommended that you use that value approach.
+
+```
+[main.dart]
+void main() {
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => Products(),)
+    ],
+    child: MyApp(),
+    ),
+  );
+}
+
+[products_grid.dart]
+ChangeNotifierProvider.value(
+    value: products[index],
+    child: ProductItem()
+),
+```
+
+<br><br>
+
