@@ -514,7 +514,7 @@ Provider(
 )
 ```
 
-### 2) Reusing an existing object instance
+### 2) Provider.value : Reusing an existing object instance
 If your already have an object instance and want to expose it, you should use the **.value** constuctor of a provider.
 
 - DO use changeNotifierProvider.value to provide an existing ChangeNotifier
@@ -675,6 +675,7 @@ favorite IconButton을 Tap 하더라도 'product rebuild' print문이 찍히지 
  }
 ```
 
+**Consumer only rebuilds the widgets that are part of its builder, Provider.of() on the other hand triggers a complete re-build(i.e. re-runs build()) of this widget's widget tree**
 
 <br><br>
 
@@ -815,6 +816,8 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
 
 ```
 
+<br>
+
 ```
 [products_grid.dart]
 
@@ -830,3 +833,27 @@ class ProductsGrid extends StatelessWidget {
   }
 }
 ```
+
+<br><br>
+
+## 14. Working with Multiple Providers.
+we'll need information about the cart in the products_overview_screen. we also need access to the cart from inside the product(product_item) becuase there we have shopping cart button. This one which allows us to add items to cart and that of course means that we need access to our cart provider.
+
+Hence the cart provider is another things that makes sense to be provided in our root widget(main.dart) because we need it in a couple of screens which are defined up there as well.
+
+```
+[main.dart]
+
+void main() {
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => Products(),),
+      ChangeNotifierProvider(create: (_) => Cart(),),
+    ],
+    child: MyApp(),
+    ),
+  );
+}
+```
+
+
