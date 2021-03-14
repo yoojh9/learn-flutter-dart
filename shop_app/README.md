@@ -856,4 +856,53 @@ void main() {
 }
 ```
 
+I'm not interested in changes to the cart, so here I'll set listen to false so that this widget does not rebuild if the cart changes because I only want to dispatch actions, I only want to tell the cart that I added a new item, and I'm not interested in changes to the cart.
 
+```
+[product_item.dart]
+
+     final cart = Provider.of<Cart>(context, listen: false);
+```
+
+## 15. Connecting the Cart Provider
+
+'value' is depend on cart. but IconButton itself and the icon does not depend on it. 
+So rebuilding this just because the cart changed it actually a bit of a waste. So I can cut this out of my Badge here and on consumer.
+so next to that builder argument, I add the child argument there and provide my icon button as a child. This is then passed as a child in the builder.
+the child on the consumer is my IconButton. this automatically gets passed into the builder by Flutter and the provider package as the ch argument.
+the important thing is that it won't be rebuilt when my cart changes becuase it's defined outside of the builder function.
+I then receive it in the builder and I can refer to it and Badge also as a child argument to which I then pass this static child I defined. so that doesn't rebuild when the cart changes.
+
+
+```
+[product_overview_screen.dart]
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<Cart>(context);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('MyShop'),
+        actions: [
+          ...
+            ]
+          ),
+
+          Consumer<Cart>(
+            builder: (_, cartData, ch) => Badge(
+              child: ch, 
+              value: cartData.itemCount.toString(),
+            ),
+            child: IconButton(
+                icon: Icon(Icons.shopping_cart), 
+                onPressed: (){},
+              ),
+          ),
+        ],
+      ),
+      body: ProductsGrid(_showOnlyFavorites),
+    );
+  }
+}
+```
