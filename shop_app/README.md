@@ -1087,3 +1087,77 @@ so That's something we want to manage inside of a single widget therefore, we us
 so in the order_item.dart, we can use the refactoring tool to convert this to a statefulWidget.
 in the State class, we can now manage or add a new porperty.
 
+```
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../providers/orders.dart' as ord;
+
+class OrderItem extends StatefulWidget {
+  final ord.OrderItem order;
+
+  OrderItem(this.order);
+
+  @override
+  _OrderItemState createState() => _OrderItemState();
+}
+
+class _OrderItemState extends State<OrderItem> {
+  var _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(10),
+      child: Column(
+        children: [
+          ListTile(
+            ...
+          ),
+          if(_expanded) 
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+              height: min(widget.order.products.length * 20.0 + 100, 120),
+              child: ListView(
+                children: widget.order.products.map((prod) => 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(prod.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      Text('${prod.quantity} x \$${prod.price}', style: TextStyle(fontSize: 18, color: Colors.grey))
+                    ]
+                  )
+                ).toList(),
+              ),
+            ),
+        ]
+      ),
+    );
+  }
+}
+```
+
+## 20. Summary
+### 1) Provider vs Consumer
+State Management is a super important topic. you don't rebuild the entire app with every little change that might affect some tiny piece in your app.
+with the provider package, you provide objects with ChangeNotifierProvider(main.dart), anywhere in your app, below these providers, so on child widget, you can listen either with **1)provider.of(context)** or with **2)consumer**.
+
+The difference between consumer and provider.of was that with provider.of(context) rerun the entire build method. even if you're in a stateless widget actually that does not matter when you're using provider.of() in there, build reruns whenever this changes.
+with the consumer, it's a bit different. There also rerun whenever the data changes but only rerun the builder function in Consumer. So consumer can be nice if you only want to rebuild a part of a widget tree when something changes instead of the entire widget tree.
+
+### 2) Nested Provider
+
+You also learned how to have provided data into another provider, like here product in products.dart that also has a ChangeNotifier and we can change the favorite status.
+and you learned also you don't just have to provide in your main.dart, you can also provide on a lower level, like products_grid.dart where we do actually provide our product items.
+
+```
+[products_grid.dart]
+
+  itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+    value: products[index],
+    child: ProductItem()
+  ),
+```
+
+### 3) listen : false
+ you can set listen to false where you really only want to get data one time or dispatch an action, where you're not interested in the resulting changes and you only just want to dispatch, then you can use listen false  
