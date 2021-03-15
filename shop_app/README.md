@@ -1137,6 +1137,8 @@ class _OrderItemState extends State<OrderItem> {
 }
 ```
 
+<br><br>
+
 ## 20. Summary
 ### 1) Provider vs Consumer
 State Management is a super important topic. you don't rebuild the entire app with every little change that might affect some tiny piece in your app.
