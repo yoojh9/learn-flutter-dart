@@ -1029,7 +1029,7 @@ class AppDrawer extends StatelessWidget {
   }
 }
 ```
-<br><br>
+<br>
 
 ```
 [product_overview_screen.dart]
@@ -1051,8 +1051,7 @@ import '../widgets/app_drawer.dart';
 }
 
 ```
-
-<br><br>
+<br>
 
 ```
 [orders_screen.dart]
@@ -1077,3 +1076,14 @@ class OrdersScreen extends StatelessWidget {
   }
 }
 ```
+
+<br><br>
+
+## 19. Making Orders Expandable & Stateful Widgets vs Providers
+whereas orders and the cart and the products are all app-wide state but whether we are viewing the details or not is definitely a local state.
+Our shop page, our cart page doesn't care a bit about whether we expanded the state or expanded the information.
+so That's something we want to manage inside of a single widget therefore, we use the default widget state management tool which is using a **statefulWidget**.
+
+so in the order_item.dart, we can use the refactoring tool to convert this to a statefulWidget.
+in the State class, we can now manage or add a new porperty.
+
