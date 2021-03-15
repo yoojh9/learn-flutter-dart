@@ -1161,3 +1161,10 @@ and you learned also you don't just have to provide in your main.dart, you can a
 
 ### 3) listen : false
  you can set listen to false where you really only want to get data one time or dispatch an action, where you're not interested in the resulting changes and you only just want to dispatch, then you can use listen false  
+
+
+### 4) Provider pattern vs StatefulWidget
+when you would use the provider pattern wide or across multiple widget
+
+when you would stick to statefulWidget, always use stateful widgets if you only have states that affects this widget. you don't have state that affects multiple different places inbn your app that maybe are also distributed in the overall widget tree.
+
