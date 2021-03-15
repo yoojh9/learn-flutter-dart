@@ -2,7 +2,7 @@
 
 ## 1. What's in this Section?
 
-<iamge src="./images/intro.png" width="400">
+<image src="./images/intro.png" width="400">
 
 <br><br>
 
