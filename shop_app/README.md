@@ -957,4 +957,123 @@ but we're listening to changes in the cart, in the cart_screen and therefore we 
 
 <br><br>
 
-## 17. Dismissible
+## 17. Adding an Order Screen
+### 1) show
+I don't need to orderItem but only the orders class, so we can use **show** Orders to only import that from this file
+
+```
+[orders_screen.dart]
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/orders.dart' show Orders;
+import '../widgets/order_item.dart';
+
+class OrdersScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final orderData = Provider.of<Orders>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Your Orders')),
+      body: ListView.builder(
+        itemCount: orderData.orders.length,
+        itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
+      ),
+    );
+  }
+}
+```
+
+
+<br><br>
+
+## 18. Using a Side Drawer
+we need a drawer to switch between our orders screen and our products screen.
+
+```
+[app_drawer.dart]
+
+import 'package:flutter/material.dart';
+import '../screens/orders_screen.dart';
+
+class AppDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          AppBar(
+            title: Text('Hello Friend!'), 
+            automaticallyImplyLeading: false, // never add a back button
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.shop),
+            title: Text('Shop'),
+            onTap: (){
+              Navigator.of(context).pushReplacementNamed('/');
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.payment),
+            title: Text('Orders'),
+            onTap: (){
+              Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+            },
+          )
+        ]
+      ),
+    );
+  }
+}
+```
+<br><br>
+
+```
+[product_overview_screen.dart]
+
+import '../widgets/app_drawer.dart';
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<Cart>(context);
+    
+    return Scaffold(
+      appBar: AppBar(
+        ...
+      ),
+      drawer: AppDrawer(),
+      body: ...,
+    );
+  }
+}
+
+```
+
+<br><br>
+
+```
+[orders_screen.dart]
+
+import '../widgets/app_drawer.dart';
+
+class OrdersScreen extends StatelessWidget {
+  static const routeName = '/orders';
+
+  @override
+  Widget build(BuildContext context) {
+    final orderData = Provider.of<Orders>(context);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Your Orders')),
+      drawer: AppDrawer(),
+      body: ListView.builder(
+        itemCount: orderData.orders.length,
+        itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
+      ),
+    );
+  }
+}
+```
