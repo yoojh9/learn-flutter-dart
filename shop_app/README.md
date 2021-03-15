@@ -954,3 +954,7 @@ class CartItem extends StatelessWidget {
 ```
 
 but we're listening to changes in the cart, in the cart_screen and therefore we rebuild the cart_screen when our cart changes. and that's exactly what I want to do because I want to rebuild the total and also my list.
+
+<br><br>
+
+## 17. Dismissible
