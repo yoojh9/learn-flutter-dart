@@ -906,3 +906,51 @@ I then receive it in the builder and I can refer to it and Badge also as a child
   }
 }
 ```
+
+<br><br>
+
+## 16. Dismissible
+the dismissible is a widget which is built into Flutter which automatically gives us a nice animation and will remove the element it warp from the UI.
+Internally this is a stateful widget. this needs a key to work correctly. you should render or use a ValueKey() and the perfect value for this is the ID of our cartItem becuase that's guaranteed to be unique.
+
+It's not really deleted. it's just deleted on the user interface. but of course, we also want to change something in our data. for that, we can define onDismissed which executes a function which we defined here once it's done.   
+
+Now important, I don't really want to set up a listener to the cart, so I'll set listen to false, I really just need access to the cart to dispatch my action.
+
+```
+[cart_item.dart]
+
+class CartItem extends StatelessWidget {
+  final String id;
+  final String productId;
+  final double price;
+  final int quantity;
+  final String title;
+
+  CartItem({this.id, this.productId, this.price, this.quantity, this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: ValueKey(id),
+      background: Container(
+        color: Theme.of(context).errorColor,
+        child: Icon(Icons.delete, color: Colors.white, size: 40),
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20),
+        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+      ),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_){
+        Provider.of<Cart>(context, listen: false).removeItem(productId);
+      },
+      child: Card(
+        ...
+      ),
+    );
+
+  }
+}
+```
+
+but we're listening to changes in the cart, in the cart_screen and therefore we rebuild the cart_screen when our cart changes. and that's exactly what I want to do because I want to rebuild the total and also my list.
