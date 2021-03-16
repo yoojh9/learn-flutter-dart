@@ -546,5 +546,97 @@ class _EditProductScreenState extends State<EditProductScreen> {
                },
                onSaved: (value){...},
             ),  
+            ...
 }
+```
+
+<br><br>
+
+## 13. Adding Validation to All Inputs
+
+### 1) price validation - tryParse
+I want to check if double.parse() succeed, tryParse() is the perfect solution for that because tryParse unlike parse does not throw an error if it fails but return null if it does fail.
+
+we know that parsing failed because tryParse returns null if it fails. Now maybe parsing succeeded but the number is smaller or equal to zero. 
+
+```
+[edit_product_screen.dart]
+
+TextFormField(
+    decoration: InputDecoration(labelText: 'Price'),
+    textInputAction: TextInputAction.next,
+    keyboardType: TextInputType.number,
+    focusNode: _priceFocusNode,
+    onFieldSubmitted: (_){
+        FocusScope.of(context).requestFocus(_descriptionFocusNode);
+    },
+    validator: (value){
+        if(value.isEmpty){
+        return 'Please enter a price.';
+        } 
+        if(double.tryParse(value)==null){
+        return 'Please enter a valid number.';
+        }
+        if(double.parse(value) <= 0) {
+        return 'Please enter a number greater than zero';
+        }
+        return null;
+    },
+)
+```
+
+### 2) description validation
+
+```
+TextFormField(
+    ...
+    validator: (value){
+        if(value.isEmpty){
+        return 'Please enter a description.';
+        }
+        if(value.length < 10){
+        return 'Should be at least 10 characters long.';
+        }
+        return null;
+    },
+    ...
+)
+```
+
+### 3) imageUrl validation
+TexrFormField의 validator argument에서 validation을 check하지 않고, _updateImageUrl() 함수에서 진행해본다.
+
+```
+  void _updateImageUrl(){
+     if(!_imageUrlFocusNode.hasFocus){
+        if(_imageUrlController.text.isEmpty || 
+          (!_imageUrlController.text.startsWith('http') && !_imageUrlController.text.startsWith('https')) ||
+          (!_imageUrlController.text.endsWith('.png') && !_imageUrlController.text.endsWith('.jpg') && !_imageUrlController.text.endsWith('.jpeg'))){
+          return;
+        }
+
+       setState(() {
+         
+       });
+     }
+  }
+```
+
+<br><br>
+
+## 14. Saving New Products
+to save product, use provider. 
+context is available everywhere in your State object.
+
+```
+  void _saveForm(){
+    final isValid = _form.currentState.validate();
+    if(isValid){
+      return;
+    }
+    _form.currentState.save();
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop();
+  }
+
 ```
