@@ -149,3 +149,68 @@ So the future resolves to a value that was passed navigator.pop()
 
 ## 4. NetworkImage
 on the NetworkImage, you can't set up a fit or anything like that becuase it's not a widget. it's just an object that does the fetching of the image and then forwards it to CircleAvatar through that background image argument and CircleAvatar will do the sizing itself.
+
+<br><br>
+
+## 5. 'Edit Product' Screen
+edit_product_screen will actually be a stateful widget. Stateful we'll have to manage all that user input.
+form input as a good candidate for a widget only or a local state and the reason for that is what the user entered is important for this widget because you want to validate it, you want to temporarilly store it and once the user submits that, presses some submit button, you typically want to save that into your app-wide state, create new product, sign up a user, whatever you're doing but until that submit button pressing, you want to only manage that data in your widget. your general app is not affected by the user input until it is really submitted.
+
+So therefore, we want to manage the user input and validate it and so on locally in this widget and hence a **StatefulWidget** is the right solution, instead of using the provider pacakge and a more globally configured object.
+
+<image src="./images/state_management.png" width="700">
+
+<br><br>
+
+## 6. Using Forms & Working with Form Inputs
+How can we handle the user input? What's a good way of doing that? Instead of manually collecting all inputs with text editing controllers, we use form widget.
+The **form** widget itself is invisible, It doesn't render somthing on the screen which you could see but inside of the form widget, you can use special input widgets which are then grouped together and which can be submitted together and validated together in very simple ways.
+A form takes a simple child argument, you build your nomal widget tree but now wrapped inside that form.
+
+In here, I first of all want to build a scrollable list of input elements and of course, for that, we can use a column with a SingleChildScrollView around it for a ListView.
+
+And now here, instead of a TextField which we used before, we use a TextFormField and that's the special input which works together with this form. TextFormField are automatically connected to that form behind the scenes and can interact with it and you'll see how to interact with the form in just second.
+
+thankfully you also don't have to add a controller here to get the input because the form will help you get that value and will manage it for you behind the scenes. 
+
+```
+Form(
+    child: ListView(children: [
+        TextFormField(
+            decoration: InputDecoration(labelText: 'Title'),
+            textInputAction: TextInputAction.next,
+        )
+    ],
+)
+```
+
+<br><br>
+
+## 7. ListView or Column
+When working with Forms, you typically have multiple input fields above each other - that's why you might want to ensure that the list of inputs is scrollable. Especially, since the soft keyboard will also take up some space on the screen.
+
+For very long form or in landscape mode, you might encounter a strange behavior: User input might get lost if an input fields scrolls out of view.
+
+That happens because the **ListView** widfget dynamically removes and re-adds widgets as they scroll out of and back into view.
+
+For short lists/ portrait-only apps, where only minimal scrolling might be needed, a ListView should be fine, since items won't scroll that far out of view (ListView has a certain threshold until which it will keep items in memory).
+
+But for longer lists or apps that should work in landscape mode as well - or maybe just to be safe - you might want to use a Column (combined with SingleChildScrollView) instead. Since SingleChildScrollView doesn't clear widgets that scroll out of view, you are not in danger of losing user input in that case.
+
+```
+// ListView
+Form(
+    child: ListView(
+        children: [ ... ],
+    ),
+),
+
+// Column + SingleChildScrollView
+Form(
+    child: SingleChildScrollView(
+        child: Column(
+            children: [ ... ],
+        ),
+    ),
+),
+```
