@@ -144,3 +144,8 @@ So the future resolves to a value that was passed navigator.pop()
   }
 
 ```
+
+<br><br>
+
+## 4. NetworkImage
+on the NetworkImage, you can't set up a fit or anything like that becuase it's not a widget. it's just an object that does the fetching of the image and then forwards it to CircleAvatar through that background image argument and CircleAvatar will do the sizing itself.
