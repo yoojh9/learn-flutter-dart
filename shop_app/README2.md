@@ -336,10 +336,10 @@ So when working with FocusNode, you sould add a dispose method to your state cla
 
 ## 10. Image Input & Image Preview
 
-아래처럼 작성 후 빌드하면 에러가 발생함.
+아래처럼 작성 후 빌드하면 다음과 같은 에러가 발생함.
 
-An InputDecorator, which is typically created by a TextField, cannot have an unbounded width.
-This happens when the parent widget does not provide a finite width constraint. For example, if the InputDecorator is contained by a Row, then its width must be constrained. An Expanded widget or a SizedBox can be used to constrain the width of the InputDecorator or the TextField that contains it.
+'An InputDecorator, which is typically created by a TextField, cannot have an unbounded width.
+This happens when the parent widget does not provide a finite width constraint. For example, if the InputDecorator is contained by a Row, then its width must be constrained. An Expanded widget or a SizedBox can be used to constrain the width of the InputDecorator or the TextField that contains it.'
 
 ```
 Row(
@@ -446,3 +446,105 @@ class _EditProductScreenState extends State<EditProductScreen> {
 in the _updateImageUrl(), we simply have to check if we're not having focus anymore, So if the _imageUrlFocusNode does not have focus and this will be fired if it had focus and we then click somewhere else and if we don't have focus anymore, so we lost focus then we want to update the UI and use the latest state stored in the imageUrlController and for that we can simply call setState(). It's a bit of a hack because we don't update the state ourselves but we know that the state has updated, that we have an updated value in _imageUrlController and we want to rebuild the screen to reflect that updated value in _imageUrlController since that value in _imageUrlController is the image you want to preview.
 
 now if I pasted my URL and I then tap into a diffrent field, you see that preview, so now we get the preview when we lose focus.
+
+
+<br><br>
+
+## 11. Submitting Forms
+How can we submit our form and get all the values the user entered? As mentioned before, this Form widget helps us with that but first of all, we need a trigger that actually leads to that form being submitted and I will actually go with two triggers, one of them is the **Done Button** because that's the last input. and I also want to have **save button** here in the action bar that should also try to submit the form.
+
+I want to submit my form with the help of the Form widget to get access to all the values. for that, you need a way to interact with the Form widget.
+So How can you get a direct access to that Form widget from inside code? For that, you can use **global key**
+
+### 1) GlobalKey
+You typically need it when you need to interact with a widget form inside your code. you do that with Form widgets and not really that much with other widgets. So hence, we add a new property in our state, a property that should hold that golbal key.
+Globalkey can hook into the state of widgets. So GlobalKey will allow us to interact with the state behind the form widget and therefore we can assign that form key to the form to establish that connection simply by setting the key argument to form which is our global key.
+
+Now we can use the form property to interact with the state managed by that form widget and form is StatefulWidget, it's invisible but behind the scenes, it does work with your form elements and gives you easy access to all your form values.
+
+```
+[edit_product_screen.dart]
+
+class _EditProductScreenState extends State<EditProductScreen> {
+  final _form = GlobalKey<FormState>();
+
+  void _saveForm(){
+    _form.currentState.save();
+  }
+
+  @override
+   Widget build(BuildContext context) {
+       return Scaffold(
+           ...
+           body: Form(
+            key: _form,
+           )
+           ...
+       )
+   }
+}
+```
+
+now with that key, with that form property which has access to this Form widget or to the state of the form widget, 
+we can reach out that property to the form property and call **_form.currentState.save()** is simply a method provided by the state ogject of the Form widget, it will save that form.
+
+_saveForm() will trigger a method on every text form field which allows you to take the value entered into the TextFormField and do with it whatever you want, for example store it into global maps collects all text inputs. 
+
+<br><br>
+
+## 12. Validating User Input
+on every TextFormField, you can add a validator argument. Now validator takes a function which takes a value and then returns a string.
+Now the value you get is the value that was currently entered into the TextFormField and the validator is executed when you call a specific validate method.
+
+if you return null, this is treated as there is no error, the input is correct. so returning null means input is correct.
+if you return a text like 'this is wrong', the text is always treated as your error text, so as the message you want to show to the user.
+So if you have a validation error and you want to return null if you don't have one.
+
+of course, it's all about comparing that value or checking that value to certain conditions you have. 
+Now the good thing is such an error message will then be shown automatically.
+The question is how can we now trigger validation? We can trigger it through the formKey.
+when we save the form, then we can also call form current state validate and this will trigger all the validators and this will return true if they all return null 
+
+
+```
+[edit_product_screen.dart]
+
+class _EditProductScreenState extends State<EditProductScreen> {
+
+  void _saveForm(){
+    final isValid = _form.currentState.validate();
+    if(isValid){
+      return;
+    }
+    _form.currentState.save();
+    print(_editedProduct.title);
+    print(_editedProduct.price);
+    print(_editedProduct.description);
+    print(_editedProduct.imageUrl);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar()
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _form,
+          child: ListView(children: [
+            TextFormField(
+               decoration: InputDecoration(labelText: 'Title', ),
+               textInputAction: TextInputAction.next,
+               onFieldSubmitted: (value){
+                 FocusScope.of(context).requestFocus(_priceFocusNode);
+               },
+               validator: (value){
+                 if(value.isEmpty){
+                   return 'Please provide a value';
+                 } 
+                 return null;
+               },
+               onSaved: (value){...},
+            ),  
+}
+```
