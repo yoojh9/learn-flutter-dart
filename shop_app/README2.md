@@ -331,3 +331,118 @@ So when working with FocusNode, you sould add a dispose method to your state cla
     super.dispose();
   }
 ```
+
+<br><br>
+
+## 10. Image Input & Image Preview
+
+아래처럼 작성 후 빌드하면 에러가 발생함.
+
+An InputDecorator, which is typically created by a TextField, cannot have an unbounded width.
+This happens when the parent widget does not provide a finite width constraint. For example, if the InputDecorator is contained by a Row, then its width must be constrained. An Expanded widget or a SizedBox can be used to constrain the width of the InputDecorator or the TextField that contains it.
+
+```
+Row(
+    children: [
+        Container(
+            width: 100,
+            height: 100,
+            margin: EdgeInsets.only(top:8, right: 10),
+            decoration: BoxDecoration(
+            border: Border.all(width: 1 , color: Colors.grey)
+            ),
+            child: _imageUrlController.text.isEmpty 
+            ? Text('Enter a URL') 
+            : FittedBox(
+                child: Image.network(_imageUrlController.text, fit: BoxFit.cover,),
+            )
+        ),
+        TextFormField(
+            decoration: InputDecoration(labelText: 'Image URL'),
+            keyboardType: TextInputType.url,
+            textInputAction: TextInputAction.done,
+            controller: _imageUrlController,
+        ),
+    ], 
+)
+```
+
+we learned that an input decoration which is created by a text field cannot have an unbounded width. So we have the problem with the width of some text form field. and the problem is that the TextFormField sits inside of a Row and the TextFormField by default takes as much width as it can get and the problem with that is if it's inside of a Row as we have it here, a Row has unconstrained width. So normally, the boundaries of the device width are the boundaries of the TextFormField but the row doesn't have these boundaries, it doesn't have the device width as an internal boundary therefore TextFormField tries to take an infinite amount of width. solution is simple. we can wrap this with a new widget and there for example, we can take the **Expanded** widget. 
+
+
+### 1) Expanded
+A widget that expands a child of a Row, Column, or Flex so that the child fills the available space.
+Using an Expanded widget makes a child of a Row, Column, or Flex expand to fill the available space along the main axis.
+If multiple children are expanded, the available space is divided among them according to the flex factor.
+An Expanded widget must be a descendant of a Row, Column, or Flex, and the path from the Expanded widget to its enclosing Row, Column, or Flex must contain only StatelessWidgets or StatefulWidgets
+
+
+
+```
+Expanded(
+  child: TextFormField(
+    decoration: InputDecoration(labelText: 'Image URL'),
+    keyboardType: TextInputType.url,
+    textInputAction: TextInputAction.done,
+    controller: _imageUrlController,
+    onEditingComplete: () {
+      setState(() {});
+    },
+  )
+),
+```
+
+### 2) onEditingComplete()
+By adding the onEditingComplete listener and by calling setState() in there(even though it's empty), we force Flutter to update the screen,
+hence picking up the latest image value entered by the user.
+
+<br>
+
+### 3) add Image Preview Listener
+one thing you could want about that imageUrl is that you actually don't need to hit this button at the bottom right to see the preview
+but that you also see that preview if this loses focus. 
+Flutter doesn't have a default listener for when this loses focus but you can set up your own listener with the help of focus node.
+
+So let's add a new FocusNode for the image, an _imageUrlFocusNode which we create with FocusNode class and of course, we have to dispose of that when the state object get destroyed.
+
+And add this _imageUrlFocusNode to our TextFormField for the imageUrl because we can now set our own listener, and when this losses focus, so when the user unselected it, then we can react to this to make sure that we updated the UI and use the imageUrlController to show a preview.
+
+so for that, we need to set up our own listener to the _imageUrlFocusNode. It's attached to that TextFormField. and therefore, it keeps track of whether that's focused or not, so we just need to listen to changes in that focus. For that, initState() is a good place to set up that initial listener. 
+important, we also have to clear that listener when we dispose of that state, otherwise the listener keeps on living in memory even though the page is not presented anymore and that again creates a memory leak. to be super safe before the _imageUrlFocusNode.dispose() I would recommend that you call remove listener.
+
+```
+class _EditProductScreenState extends State<EditProductScreen> {
+  final _priceFocusNode = FocusNode();
+  final _descriptionFocusNode = FocusNode();
+  final _imageUrlController = TextEditingController();
+  final _imageUrlFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    _imageUrlFocusNode.addListener(_updateImageUrl);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _imageUrlFocusNode.removeListener(_updateImageUrl);
+    _priceFocusNode.dispose();
+    _descriptionFocusNode.dispose();
+    _imageUrlController.dispose();
+    _imageUrlFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _updateImageUrl(){
+     if(!_imageUrlFocusNode.hasFocus){
+       setState(() {
+         
+       });
+     }
+  }
+}
+```
+
+in the _updateImageUrl(), we simply have to check if we're not having focus anymore, So if the _imageUrlFocusNode does not have focus and this will be fired if it had focus and we then click somewhere else and if we don't have focus anymore, so we lost focus then we want to update the UI and use the latest state stored in the imageUrlController and for that we can simply call setState(). It's a bit of a hack because we don't update the state ourselves but we know that the state has updated, that we have an updated value in _imageUrlController and we want to rebuild the screen to reflect that updated value in _imageUrlController since that value in _imageUrlController is the image you want to preview.
+
+now if I pasted my URL and I then tap into a diffrent field, you see that preview, so now we get the preview when we lose focus.
