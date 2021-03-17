@@ -640,3 +640,113 @@ context is available everywhere in your State object.
   }
 
 ```
+
+<br><br>
+
+## 15. Update Product
+Product 정보 수정 기능도 추가해본다.
+
+- user_product_item.dart 파일에서 EditProductScreen으로 Navigation 시에 argument로 id를 전달한다.
+
+```
+[user_product_item.dart]
+
+Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
+```
+
+<br>
+
+- edit_product_screen.dart에서 argument로 전달받은 id로 기존 정보를 불러온다. initState()에서는 context 접근이 안되므로, didChangeDependencies에서 argument를 가져온다.
+
+```
+[edit_product_screen.dart]
+
+class _EditProductScreenState extends State<EditProductScreen> {
+
+  Product _editedProduct = Product(id: null, title: '', description: '', price: 0, imageUrl: '');
+  
+  var _initValue = {
+    'title': '',
+    'description': '',
+    'price' : '',
+    'imageUrl': ''
+  };
+
+  var _isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    if(_isInit) {
+      final productId = ModalRoute.of(context).settings.arguments as String;
+      
+      if(productId != null) {
+        _editedProduct = Provider.of<Products>(context).findById(productId);
+        _initValue = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          'price': _editedProduct.price.toString(),
+          'imageUrl': _editedProduct.imageUrl
+        };
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _form,
+          child: ListView(children: [
+            TextFormField(
+               initialValue: _initValue['title'],
+            )
+            ...
+
+            Expanded(
+                  child: TextFormField(
+                    initialValue: _initValue['imageUrl'],
+                    ...
+                    controller: _imageUrlController,
+                  )
+            )
+          ]
+          )
+        )
+      )
+  }
+}
+```
+
+- TextFormField에 initialValue argument를 사용하여 기존 값을 불러오는데, imageUrl TextFormField에서 에러가 발생하게 된다. 이는 controller와 initialValue를 같이 사용할 수 없기 때문이다. If you have a controller, you can't set the initial value, instead then you should set the controller to an initial value and that will be reflected back into the TextFormField and what  you see on the screen automatically.
+
+<br>
+
+- So therefore, in didChangeDependencies(), simply set imageUrl to an empty String or to null, and reach out the imageUrl controller and set the text equal to the _editedProduct.imageUrl
+
+```
+@override
+void didChangeDependencies() {
+    if(_isInit) {
+        final productId = ModalRoute.of(context).settings.arguments as String;
+        
+        if(productId != null) {
+        _editedProduct = Provider.of<Products>(context).findById(productId);
+        _initValue = {
+            'title': _editedProduct.title,
+            'description': _editedProduct.description,
+            'price': _editedProduct.price.toString(),
+            'imageUrl': ''
+        };
+        _imageUrlController.text = _editedProduct.imageUrl;
+        }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+}
+```
