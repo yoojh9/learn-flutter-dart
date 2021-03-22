@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "145218009329",
+    "project_id": "flutter-shop-app-a7833",
+    "storage_bucket": "flutter-shop-app-a7833.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145218009329:android:c052d81d7961938b2cd150",
+        "android_client_info": {
+          "package_name": "com.example.shop_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145218009329-1h1gqh4lrg4fhq9h1kgcrm9elk9b5njr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClu4yNgg4cxMD8LAyyc0nXiaqWFcxgcms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145218009329-1h1gqh4lrg4fhq9h1kgcrm9elk9b5njr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "145218009329-20nk2ge573kptl6v1tij5dtm7og1p8n7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.shopApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

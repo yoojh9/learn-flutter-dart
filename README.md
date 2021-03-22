@@ -9,5 +9,5 @@
 - [5. Widget & Flutter Internal - Deep Device](./widget_deep_dive)
 - [6. Navigation & Multiple Screens - Meals App](./meal_app)
 - [7. Advanced App & State Management - Shop App](./shop_app)
-- [8. Working with User Input & Forms - Shop App](./shop_app/README2.md)
+- [8. Working with User Input & Forms - Shop App](./http_shop_app)
 
